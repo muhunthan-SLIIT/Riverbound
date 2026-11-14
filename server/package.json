@@ -1,0 +1,26 @@
+{
+  "name": "@riverbound/server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Riverbound backend: Express REST API + MongoDB (Mongoose).",
+  "exports": {
+    "./models": "./src/models/index.ts",
+    "./db": "./src/config/db.ts"
+  },
+  "scripts": {
+    "dev": "node --watch --env-file-if-exists=.env src/index.ts",
+    "start": "node --env-file-if-exists=.env src/index.ts",
+    "smoke": "node --env-file-if-exists=.env scripts/smoke.ts",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@riverbound/shared": "*",
+    "express": "^5.1.0",
+    "mongoose": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3"
+  }
+}

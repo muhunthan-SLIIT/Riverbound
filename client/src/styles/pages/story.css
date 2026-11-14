@@ -1,0 +1,141 @@
+/* Page 07 — Story Introduction. Figma 1440 x 900: full-bleed art, narration card bottom-left
+   (688 x 340, x 64, y 460), Next (320) bottom-right, Back and Skip chips along the bottom. */
+.story {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  padding: var(--space-7) var(--space-8) var(--space-6);
+}
+
+.story__art {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  animation: story-fade 450ms ease-out;
+}
+@keyframes story-fade {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .story__art {
+    animation: none;
+  }
+}
+
+.story__narration {
+  align-self: end;
+  width: min(100%, 688px);
+  padding: var(--space-5) var(--space-6) var(--space-7);
+  border-radius: var(--radius-card);
+  background: var(--color-ink);
+}
+
+.story__step {
+  display: flex;
+  gap: var(--space-4);
+  margin: 0;
+  color: var(--color-gold);
+  font: 600 16px/1.35 var(--font-body);
+  letter-spacing: 0.02em;
+}
+
+.story__title {
+  margin: var(--space-3) 0 0;
+  font-size: clamp(32px, 3.05vw, 44px);
+  line-height: 1.35;
+}
+
+.story__text {
+  margin: var(--space-4) 0 0;
+  font-size: clamp(18px, 1.55vw, 22px);
+  line-height: 1.35;
+}
+
+.story__narration .form-alert {
+  margin-top: var(--space-4);
+}
+
+.story__controls {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+.story__back {
+  min-width: 144px;
+}
+
+.story__forward {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-5);
+  margin-top: -80px; /* Figma: Next sits beside the narration card, above the Skip chip */
+}
+
+.story__next {
+  width: var(--action-width);
+}
+
+.story__skip {
+  width: 344px;
+  color: var(--color-mist);
+}
+
+.story__dots {
+  position: absolute;
+  left: 50%;
+  bottom: 40px;
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  transform: translateX(-50%);
+}
+.story__dots li {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgb(244 232 204 / 45%);
+}
+.story__dots li.is-active {
+  width: 28px;
+  border-radius: 5px;
+  background: var(--color-gold);
+}
+
+/* ---------- Tablet and mobile ---------- */
+@media (max-width: 900px) {
+  .story {
+    padding: var(--space-5);
+  }
+  .story__narration {
+    width: 100%;
+    padding: var(--space-5);
+  }
+  .story__controls {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    padding-bottom: var(--space-6);
+  }
+  .story__forward {
+    align-items: stretch;
+    gap: var(--space-3);
+    margin-top: 0;
+  }
+  .story__next,
+  .story__skip,
+  .story__back {
+    width: 100%;
+  }
+  .story__dots {
+    bottom: var(--space-4);
+  }
+}

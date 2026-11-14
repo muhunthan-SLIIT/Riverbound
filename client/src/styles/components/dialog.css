@@ -1,0 +1,42 @@
+/* Confirmation modal (Figma design-system "confirmation modal"). */
+.dialog {
+  width: min(92vw, 520px);
+  padding: var(--space-6);
+  border: 1px solid var(--color-reed);
+  border-radius: var(--radius-card);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  box-shadow: 0 30px 80px rgb(0 0 0 / 45%);
+}
+.dialog::backdrop {
+  background: rgb(7 59 58 / 75%);
+  backdrop-filter: blur(2px);
+}
+.dialog__title {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.3;
+}
+.dialog__body {
+  margin: var(--space-3) 0 var(--space-5);
+  color: var(--color-mist);
+  font-size: 18px;
+  line-height: 1.45;
+}
+.dialog__body p {
+  margin: 0 0 var(--space-3);
+}
+.dialog .form-alert {
+  margin-bottom: var(--space-4);
+}
+.dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+@media (max-width: 480px) {
+  .dialog__actions .btn {
+    flex: 1 1 100%;
+  }
+}

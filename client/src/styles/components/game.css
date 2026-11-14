@@ -1,0 +1,293 @@
+/* Shared camp-screen frame: HUD (Figma 1344 x 88, radius 20, border #376159) and
+   camp navigation (1344 x 64, radius 16, eight 168px items). */
+.game {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: var(--space-5) var(--space-7) var(--space-5);
+}
+
+.game__body {
+  position: relative;
+  min-height: 0;
+}
+
+/* ---------- HUD ---------- */
+.hud {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 88px;
+  padding: 11px var(--space-5) 11px 15px;
+  border: 1px solid var(--color-hud-border);
+  border-radius: 20px;
+  background: var(--color-ink);
+}
+
+.hud__portrait {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+.hud__who {
+  flex: 1;
+  min-width: 0;
+}
+
+.hud__name {
+  margin: 0;
+  font: 600 20px/1.35 var(--font-body);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hud__hearts {
+  display: flex;
+  align-items: center;
+  gap: var(--space-7);
+  margin: var(--space-1) 0 0;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.hud__hearts > span:first-child {
+  white-space: nowrap;
+}
+
+.hud__heart-icons {
+  display: inline-flex;
+  gap: var(--space-2);
+}
+.heart {
+  fill: var(--color-coral);
+  stroke: var(--color-coral);
+  stroke-width: 1.5;
+}
+.heart--empty {
+  fill: transparent;
+  opacity: 0.6;
+}
+
+.hud__coins {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 220px;
+  margin: 0;
+  color: var(--color-gold);
+  font: 600 21px/1.35 var(--font-body);
+}
+
+.hud__coin-tile {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--color-paper);
+}
+
+.hud__links {
+  display: flex;
+  flex-direction: column;
+  min-width: 100px;
+}
+
+.hud__link {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-paper);
+  font: 400 16px/44px var(--font-body);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.hud__link:hover {
+  color: var(--color-gold);
+}
+.hud__links .hud__link + .hud__link {
+  margin-top: -4px;
+}
+
+/* ---------- Camp navigation ---------- */
+.camp-nav {
+  margin-top: var(--space-4);
+  border-radius: var(--radius-panel);
+  background: var(--color-ink);
+}
+
+.camp-nav .camp-nav__toggle {
+  display: none;
+}
+
+.camp-nav__list {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  margin: 0;
+  padding: var(--space-2) 0;
+  list-style: none;
+}
+
+.camp-nav__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: var(--chip-height);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-control);
+  color: var(--color-paper);
+  font: 600 17px/1.35 var(--font-body);
+  text-decoration: none;
+}
+.camp-nav__link:hover {
+  background: rgb(244 232 204 / 8%);
+}
+.camp-nav__link.is-current {
+  color: var(--color-gold);
+}
+.camp-nav__link.is-current::after {
+  content: '';
+  position: absolute;
+  left: var(--space-4);
+  right: var(--space-4);
+  bottom: 6px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-gold);
+}
+
+/* ---------- Shared camp panels ---------- */
+.panel {
+  border-radius: 20px;
+  background: var(--color-ink);
+}
+
+.panel-eyebrow {
+  margin: 0;
+  color: var(--color-gold);
+  font: 600 12px/1.35 var(--font-body);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 104px;
+  z-index: 10;
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid var(--color-emerald);
+  border-radius: var(--radius-control);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-weight: 600;
+  transform: translateX(-50%);
+  box-shadow: 0 12px 30px rgb(0 0 0 / 35%);
+}
+.toast--error {
+  border-color: var(--color-coral);
+}
+
+/* ---------- Tablet ---------- */
+@media (max-width: 1100px) {
+  .game {
+    padding: var(--space-4);
+  }
+  .hud {
+    gap: var(--space-3);
+    padding-right: var(--space-4);
+  }
+  .hud__hearts {
+    gap: var(--space-3);
+  }
+  .hud__coins {
+    min-width: 0;
+    gap: var(--space-2);
+  }
+  .camp-nav__list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Phone: navigation becomes a menu sheet ---------- */
+@media (max-width: 700px) {
+  .hud {
+    flex-wrap: wrap;
+    row-gap: var(--space-2);
+  }
+  .hud__portrait {
+    width: 48px;
+    height: 48px;
+  }
+  .hud__who {
+    flex: 1 1 calc(100% - 64px);
+  }
+  .hud__coins {
+    flex: 1;
+  }
+  .hud__name {
+    font-size: 17px;
+  }
+  .hud__hearts {
+    font-size: 15px;
+  }
+  .hud__coins {
+    font-size: 17px;
+  }
+  .hud__coin-tile {
+    width: 36px;
+    height: 36px;
+  }
+  .hud__coin-tile .sprite-icon {
+    width: 30px !important;
+    height: 30px !important;
+  }
+  .hud__links {
+    flex-direction: row;
+    gap: var(--space-4);
+    min-width: 0;
+  }
+  .hud__links .hud__link + .hud__link {
+    margin-top: 0;
+  }
+
+  .camp-nav {
+    position: sticky;
+    bottom: var(--space-3);
+    padding: var(--space-2);
+  }
+  .camp-nav .camp-nav__toggle {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+  }
+  .camp-nav__list {
+    display: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-1);
+    padding: var(--space-2) 0 0;
+  }
+  .camp-nav--open .camp-nav__list {
+    display: grid;
+  }
+  .toast {
+    bottom: 88px;
+    width: calc(100% - 32px);
+    text-align: center;
+  }
+}
+
+/* Settings and Help when there is no journey in progress: a simple back link instead of the HUD. */
+.account-frame__top {
+  display: flex;
+}
+.account-frame__back {
+  width: auto;
+}

@@ -1,0 +1,58 @@
+/* Living River design tokens from the Figma file. Use these variables everywhere; never hard-code colours. */
+:root {
+  --color-river: #073b3a;
+  --color-emerald: #147d64;
+  --color-water: #45c4c0;
+  --color-gold: #f2bd52;
+  --color-paper: #f4e8cc;
+  --color-ink: #102531;
+  --color-wood: #694632;
+  --color-coral: #e56b65;
+  --color-muted: #b6c9bc;
+  /* Extra values used in the Figma frames */
+  --color-mist: #bed2c4; /* supporting text on dark backgrounds */
+  --color-reed: #507a6d; /* border of secondary buttons */
+  --color-cream: #f9f2e1; /* form input background */
+  --color-hud-border: #376159; /* HUD outline */
+  --color-hotspot-border: #648673; /* camp hotspot outline */
+  --color-disabled-bg: #364d4c; /* disabled action background */
+  --color-disabled-text: #a9b7af;
+  --color-sand: #dfd2ad; /* food-supply box on paper cards */
+  --color-cream-light: #fffbf0; /* answer input on paper */
+  --color-foam: #d6ebe1; /* crossing picture card */
+  --color-forest: #0e4f47; /* highlighted dark card (fed stock, shop shelf) */
+  --scrim-ink: rgb(16 37 49 / 58%); /* dark layer over artwork so text stays readable */
+
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 80px;
+
+  --radius-panel: 16px;
+  --radius-card: 24px;
+  --radius-control: 12px;
+  --tap-target: 44px;
+  --button-height: 56px;
+  --chip-height: 48px;
+  --action-width: 320px;
+
+  --motion-fast: 150ms;
+  --motion-normal: 250ms;
+  --motion-catch: 350ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-normal: 0ms;
+    --motion-catch: 0ms;
+  }
+}

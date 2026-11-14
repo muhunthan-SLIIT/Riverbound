@@ -1,0 +1,171 @@
+/* Page 06 — Character Selection. Figma 1440 x 900: river art under a 60% ink layer,
+   two paper explorer cards (424 x 524), dark panel (384 x 524), note bar at the bottom. */
+.choose {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-7) var(--space-7) var(--space-5);
+}
+
+.choose__backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgb(16 37 49 / 60%);
+}
+
+.choose__main {
+  flex: 1;
+  padding: 0 var(--space-2) var(--space-6);
+}
+
+.choose__title {
+  margin: 0;
+  font-size: clamp(34px, 3.6vw, 52px);
+  line-height: 1.35;
+}
+
+.choose__subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--color-mist);
+  font-size: clamp(17px, 1.45vw, 21px);
+  line-height: 1.35;
+}
+
+.choose__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 880fr) minmax(300px, 384fr);
+  gap: var(--space-6) var(--space-8);
+  margin-top: var(--space-7);
+}
+
+.choose__cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6);
+}
+
+/* ---------- Explorer card (a radio button) ---------- */
+.explorer-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--space-4) var(--space-4) var(--space-5);
+  border: 4px solid transparent;
+  border-radius: var(--radius-card);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    border-color var(--motion-fast),
+    transform var(--motion-fast);
+}
+.explorer-card:hover {
+  transform: translateY(-2px);
+}
+.explorer-card--selected {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 4px rgb(242 189 82 / 25%);
+}
+.explorer-card:focus-visible {
+  outline: 3px solid var(--color-water);
+  outline-offset: 4px;
+}
+
+.explorer-card__portrait {
+  width: 100%;
+  aspect-ratio: 392 / 384;
+  height: auto;
+  border-radius: var(--radius-panel);
+  object-fit: cover;
+  object-position: center 30%;
+  background: var(--color-river);
+}
+
+.explorer-card__name {
+  margin: var(--space-5) var(--space-2) 0;
+  font: 600 clamp(22px, 1.95vw, 28px) / 1.35 var(--font-display);
+  font-variation-settings: 'SOFT' 0, 'WONK' 1;
+}
+
+.explorer-card__state {
+  margin: var(--space-2) var(--space-2) 0;
+  color: var(--color-wood);
+  font: 600 17px/1.35 var(--font-body);
+}
+
+/* ---------- Selected explorer panel ---------- */
+.choose__panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border-radius: var(--radius-card);
+  background: var(--color-ink);
+}
+
+.choose__panel-title {
+  margin: 0;
+  font-size: clamp(32px, 2.8vw, 40px);
+  line-height: 1.35;
+}
+
+.choose__panel-text {
+  margin: 0 0 var(--space-3);
+  color: var(--color-mist);
+  font-size: clamp(18px, 1.55vw, 22px);
+  line-height: 1.35;
+}
+
+.choose__panel .form-alert a {
+  color: var(--color-gold);
+}
+
+.choose__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: auto;
+  padding-top: var(--space-5);
+}
+
+/* ---------- Note bar ---------- */
+.choose__note {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--color-ink);
+  color: var(--color-mist);
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+/* ---------- Tablet and mobile ---------- */
+@media (max-width: 1100px) {
+  .choose {
+    padding: var(--space-5);
+  }
+  .choose__layout {
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: var(--space-5);
+  }
+}
+
+@media (max-width: 560px) {
+  .choose__cards {
+    gap: var(--space-3);
+  }
+  .explorer-card {
+    padding: var(--space-2) var(--space-2) var(--space-4);
+  }
+  .explorer-card__name {
+    font-size: 18px;
+    margin-top: var(--space-3);
+  }
+  .explorer-card__state {
+    font-size: 14px;
+  }
+  .choose__panel {
+    padding: var(--space-5);
+  }
+}

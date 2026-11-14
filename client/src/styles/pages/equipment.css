@@ -1,0 +1,161 @@
+/* Page 15 — Equipment / Loadouts. Figma 1440 x 900, camp art: three dark panels
+   (400 / 464 / 416 x 520) for loadout, fishing method and travel readiness. */
+.rack .scene__art {
+  object-position: center;
+}
+
+.rack__main {
+  padding-top: var(--space-5);
+}
+
+.rack__eyebrow {
+  font-size: 15px;
+}
+
+.rack__title {
+  margin: var(--space-1) 0 0;
+  font-size: clamp(30px, 2.9vw, 42px);
+  line-height: 1.35;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 50%);
+}
+
+.rack__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 400fr) minmax(0, 464fr) minmax(0, 416fr);
+  gap: var(--space-6);
+  margin-top: var(--space-5);
+}
+
+.rack__panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 520px;
+  padding: var(--space-5);
+}
+
+.rack__panel-title {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.35;
+}
+
+.rack__portrait {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 352 / 320;
+  margin-top: var(--space-4);
+  border-radius: var(--radius-panel);
+  object-fit: cover;
+  object-position: center 25%;
+  background: var(--color-river);
+}
+
+.rack__text {
+  margin: var(--space-5) 0 0;
+  color: var(--color-mist);
+  font-size: 19px;
+  line-height: 1.4;
+}
+
+.rack__subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--color-gold);
+  font-weight: 600;
+}
+
+/* ---------- Fishing methods (radio list) ---------- */
+.rack__method {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  min-height: var(--tap-target);
+  margin-top: var(--space-4);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-gold);
+  border-radius: var(--radius-control);
+  background: rgb(242 189 82 / 10%);
+  color: var(--color-paper);
+  font-weight: 600;
+}
+.rack__method-state {
+  color: var(--color-gold);
+  font-size: 15px;
+}
+
+.rack__link {
+  margin-top: var(--space-4);
+  color: var(--color-paper);
+}
+.rack__actions .rack__link {
+  color: var(--color-water);
+  margin-top: var(--space-2);
+}
+
+/* ---------- Travel checklist ---------- */
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.checklist li {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-mist);
+  font-size: 18px;
+}
+.checklist li .sprite-icon {
+  opacity: 0.55;
+  filter: grayscale(0.6);
+}
+.checklist li.is-done {
+  color: var(--color-paper);
+}
+.checklist li.is-done .sprite-icon {
+  opacity: 1;
+  filter: none;
+}
+.checklist__mark {
+  color: var(--color-coral);
+  font-size: 15px;
+  font-weight: 600;
+}
+.is-done .checklist__mark {
+  color: var(--color-water);
+}
+
+.rack__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: auto;
+  padding-top: var(--space-5);
+}
+.rack__primary {
+  width: var(--action-width);
+  max-width: 100%;
+}
+
+/* ---------- Tablet and phone ---------- */
+@media (max-width: 1100px) {
+  .rack__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .rack__panel {
+    min-height: 0;
+  }
+  .rack__portrait {
+    max-width: 280px;
+  }
+}
+@media (max-width: 700px) {
+  .rack__primary {
+    width: 100%;
+  }
+}

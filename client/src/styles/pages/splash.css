@@ -1,0 +1,83 @@
+/* Page 01 — Splash / Loading. Figma frame 1440 x 900: centred column over darkened river art. */
+.splash {
+  display: grid;
+  place-items: center;
+  padding: var(--space-7) var(--space-5);
+}
+
+.splash__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: min(100%, 680px);
+}
+
+.splash__emblem {
+  width: clamp(112px, 11vw, 160px);
+  height: auto;
+}
+
+.splash__title {
+  margin: var(--space-7) 0 0;
+  font-size: clamp(44px, 5vw, 72px);
+  line-height: 1.35;
+}
+
+.splash__tagline {
+  margin: var(--space-1) 0 0;
+  text-wrap: balance;
+  font-size: clamp(17px, 1.6vw, 22px);
+  line-height: 1.35;
+}
+
+/* The teal "ripple line" under the tagline. It flows gently while loading. */
+.splash__ripple {
+  width: var(--action-width);
+  max-width: 100%;
+  height: 3px;
+  margin-top: var(--space-7);
+  border-radius: 2px;
+  background: var(--color-water);
+}
+.splash__ripple--busy {
+  background: linear-gradient(90deg, rgb(69 196 192 / 25%) 0%, var(--color-water) 50%, rgb(69 196 192 / 25%) 100%);
+  background-size: 200% 100%;
+  animation: splash-ripple 1.6s linear infinite;
+}
+@keyframes splash-ripple {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .splash__ripple--busy {
+    animation: none;
+  }
+}
+
+.splash__status {
+  /* Figma: the status line starts at the button's left edge but may run wider (500px). */
+  width: 100%;
+  padding-left: max(0px, calc((100% - var(--action-width)) / 2));
+  margin: var(--space-6) 0 0;
+  color: var(--color-mist);
+  font-size: clamp(17px, 1.4vw, 20px);
+  line-height: 1.35;
+  text-align: left;
+}
+
+.splash__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: var(--action-width);
+  max-width: 100%;
+  margin-top: var(--space-7);
+}
+.splash__actions .btn-chip {
+  color: var(--color-mist);
+}

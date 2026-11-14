@@ -1,0 +1,110 @@
+/* Page 20 — Team Journal. Figma 1440 x 900: camp art, three paper cards 432 x 520 (gap 24),
+   portrait 384 x 224 inside each card. */
+.team__main {
+  padding-top: var(--space-5);
+}
+.team__eyebrow {
+  font-size: 15px;
+}
+.team__title {
+  margin: var(--space-1) 0 0;
+  font-size: clamp(30px, 2.9vw, 42px);
+  line-height: 1.35;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 50%);
+}
+
+.team__cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.team__card {
+  display: flex;
+  flex-direction: column;
+  min-height: 520px;
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.team__portrait {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 384 / 224;
+  border-radius: 16px;
+  object-fit: cover;
+  object-position: center 20%;
+  background: var(--color-forest);
+}
+
+.team__name {
+  margin: var(--space-5) 0 0;
+  color: var(--color-ink);
+  font-size: 34px;
+  line-height: 1.35;
+}
+.team__status {
+  margin: var(--space-2) 0 0;
+  color: var(--color-wood);
+  font-weight: 600;
+  font-size: 14px;
+}
+.team__flag {
+  text-transform: uppercase;
+}
+.team__ability {
+  margin: var(--space-4) 0 0;
+  font-size: 20px;
+  line-height: 1.35;
+}
+.team__use {
+  margin: auto 0 0;
+  padding-top: var(--space-5);
+  color: var(--color-wood);
+  font-size: 17px;
+}
+
+/* Not rescued yet: dimmed portrait, same layout. Text says so too (not colour alone). */
+.team__card--missing .team__portrait {
+  filter: grayscale(1) brightness(0.55);
+}
+.team__card--missing {
+  background: var(--color-sand);
+}
+
+@media (max-width: 1100px) {
+  .team__cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .team__card {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr auto;
+    column-gap: var(--space-5);
+    min-height: 0;
+  }
+  .team__portrait {
+    grid-row: 1 / 5;
+  }
+  .team__name {
+    margin-top: 0;
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 560px) {
+  .team__card {
+    display: flex;
+  }
+  .team__name {
+    margin-top: var(--space-4);
+  }
+  .team__ability {
+    font-size: 18px;
+  }
+}

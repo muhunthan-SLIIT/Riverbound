@@ -1,0 +1,122 @@
+/* Page 21 — Region Complete. Figma 1440 x 900: expedition map art, HUD and navigation,
+   one card 1104 x 624 at (168, 144): results on the left (650 px), gold bonus column on the right (336 px). */
+.checkpoint__card {
+  position: relative;
+  width: min(1104px, 100%);
+  margin: var(--space-5) auto 0;
+  padding: var(--space-6) 40px;
+  border-radius: var(--radius-card);
+  background: var(--color-ink);
+  box-shadow: 0 16px 40px rgb(0 0 0 / 35%);
+}
+.checkpoint__card--empty {
+  max-width: 640px;
+}
+
+.checkpoint__title {
+  margin: var(--space-3) 0 0;
+  font-size: clamp(36px, 3.75vw, 54px);
+  line-height: 1.35;
+}
+.checkpoint__title--small {
+  font-size: 32px;
+}
+
+.checkpoint__results {
+  display: grid;
+  grid-template-columns: minmax(0, 650fr) minmax(0, 336fr);
+  gap: var(--space-6);
+  margin-top: var(--space-5);
+}
+
+.checkpoint__table {
+  border-collapse: collapse;
+  color: var(--color-paper);
+  font-size: 23px;
+  line-height: 1.35;
+}
+.checkpoint__table th,
+.checkpoint__table td {
+  padding: 0 var(--space-5) 0 0;
+  font-weight: 400;
+  text-align: left;
+  white-space: nowrap;
+}
+.checkpoint__claimed {
+  color: var(--color-mist);
+}
+
+.checkpoint__bonus {
+  margin: 0;
+  color: var(--color-gold);
+  font: 600 23px/1.35 var(--font-display);
+}
+
+.checkpoint__text {
+  margin: var(--space-6) 0 0;
+  color: var(--color-mist);
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.checkpoint__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-5) var(--space-6);
+  margin-top: var(--space-7);
+}
+.checkpoint__primary,
+.checkpoint__secondary {
+  width: var(--action-width);
+  max-width: 100%;
+}
+.checkpoint__link {
+  color: var(--color-water);
+  font-weight: 600;
+}
+
+.checkpoint__note {
+  margin: var(--space-6) 0 0;
+  color: var(--color-mist);
+  font-size: 17px;
+}
+
+@media (max-width: 1100px) {
+  .checkpoint__results {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .checkpoint__table {
+    font-size: 19px;
+  }
+}
+
+@media (max-width: 560px) {
+  .checkpoint__card {
+    padding: var(--space-5);
+  }
+  .checkpoint__table th {
+    display: block;
+    padding: 0;
+  }
+  .checkpoint__table td {
+    display: inline-block;
+    padding: 0 var(--space-3) 0 0;
+  }
+  .checkpoint__table tr {
+    display: block;
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--color-hud-border);
+  }
+  .checkpoint__table th {
+    font-weight: 600;
+  }
+  .checkpoint__text {
+    font-size: 18px;
+  }
+  .checkpoint__primary,
+  .checkpoint__secondary,
+  .checkpoint__link {
+    width: 100%;
+  }
+}

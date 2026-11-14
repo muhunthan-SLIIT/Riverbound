@@ -1,0 +1,198 @@
+/* Page 16 — River Map. Figma 1440 x 900, painted expedition map: title card (472 x 96),
+   four route markers (288 x 104), details panel (432 x 352) at x 960, y 412. */
+.rivermap .scene__art {
+  object-position: center;
+}
+/* Markers are placed against the whole painting (like the camp hotspots). */
+.rivermap .game__body {
+  position: static;
+}
+
+
+.rivermap__title-card {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+  margin-top: var(--space-5);
+  padding: 20px var(--space-5);
+  border-radius: 20px;
+  background: var(--color-ink);
+}
+.rivermap__title {
+  margin: 0;
+  font-size: clamp(30px, 2.8vw, 40px);
+  line-height: 1.35;
+}
+
+/* ---------- Markers ---------- */
+.rivermap__markers {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.marker {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 288px;
+  min-height: 104px;
+  padding: 12px var(--space-4);
+  border: 3px solid transparent;
+  border-radius: var(--radius-panel);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform var(--motion-fast);
+}
+.marker:hover {
+  transform: translateY(-2px);
+}
+.marker--selected {
+  border-color: var(--color-gold);
+}
+.marker__name {
+  font: 600 26px/1.35 var(--font-display);
+  font-variation-settings: 'SOFT' 0, 'WONK' 1;
+}
+.marker__sub {
+  color: var(--color-mist);
+  font-size: 16px;
+}
+.marker--available .marker__sub {
+  color: var(--color-gold);
+}
+.marker--cleared .marker__sub {
+  color: var(--color-water);
+}
+.marker--locked .marker__name {
+  opacity: 0.85;
+}
+
+/* ---------- Details panel ---------- */
+.route-panel {
+  position: absolute;
+  z-index: 2;
+  right: var(--space-7);
+  top: calc(412 / 900 * 100%);
+  width: min(432px, 100%);
+  padding: var(--space-5);
+}
+.route-panel__title {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.35;
+}
+.route-panel__text {
+  margin: var(--space-3) 0 0;
+  color: var(--color-mist);
+  font-size: 19px;
+  line-height: 1.4;
+}
+.route-panel__go {
+  width: var(--action-width);
+  max-width: 100%;
+  margin-top: var(--space-6);
+}
+.route-panel__list {
+  display: flex;
+  margin-top: var(--space-2);
+  color: var(--color-water);
+}
+
+/* ---------- Accessible list ---------- */
+.route-list {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 780px);
+  margin-top: var(--space-4);
+  padding: var(--space-5);
+}
+.route-list__title {
+  margin: 0;
+  font-size: 26px;
+}
+.route-list__items {
+  margin: var(--space-3) 0 0;
+  padding-left: var(--space-5);
+  color: var(--color-mist);
+  font-size: 18px;
+  line-height: 1.6;
+}
+.route-list__items strong {
+  color: var(--color-paper);
+}
+.route-list__items a {
+  color: var(--color-gold);
+}
+.route-list__close {
+  margin-top: var(--space-3);
+  color: var(--color-water);
+}
+
+/* ---------- Map not bought yet ---------- */
+.rivermap__locked {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding: var(--space-6) 0;
+}
+.rivermap__locked-card {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  max-width: 520px;
+  padding: var(--space-6);
+  text-align: center;
+  font-size: 19px;
+}
+.rivermap__locked-card .sprite-icon {
+  border-radius: var(--radius-control);
+  background-color: var(--color-paper);
+}
+.rivermap__locked-card p {
+  margin: 0;
+  color: var(--color-mist);
+}
+.rivermap__locked-title {
+  margin: 0;
+  font-size: 32px;
+}
+.rivermap__locked-price {
+  color: var(--color-gold) !important;
+  font-weight: 600;
+}
+
+/* ---------- Smaller screens: markers become a list, panel follows ---------- */
+@media (max-width: 1100px), (max-height: 700px) {
+  .rivermap .game__body {
+    position: relative;
+  }
+  .rivermap__markers {
+    position: static !important;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+    pointer-events: auto;
+  }
+  .marker {
+    position: static;
+    width: auto;
+  }
+  .route-panel {
+    position: static;
+    width: 100%;
+    margin-top: var(--space-4);
+  }
+}
+@media (max-width: 700px) {
+  .route-panel__go {
+    width: 100%;
+  }
+}

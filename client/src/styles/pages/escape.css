@@ -1,0 +1,106 @@
+/* Page 23 — Final Escape. Figma 1440 x 900: boat painting, no HUD; summary card 472 x 712 at (920, 72),
+   "Start New Campaign" chip 328 x 48 below it at (1048, 812). */
+.escape .scene__art {
+  object-position: 30% center; /* keep the four explorers in the boat visible */
+}
+
+.escape__main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-5);
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: clamp(var(--space-5), 8vh, 72px) clamp(var(--space-4), 3.3vw, 48px) var(--space-5);
+}
+
+.escape__card {
+  width: min(472px, 100%);
+  padding: var(--space-6);
+  border-radius: var(--radius-card);
+  background: var(--color-ink);
+  box-shadow: 0 16px 40px rgb(0 0 0 / 35%);
+}
+.escape__card--notice {
+  position: relative;
+  max-width: 560px;
+  margin: 20vh auto 0;
+}
+
+.escape__title {
+  margin: var(--space-4) 0 0;
+  font-size: clamp(44px, 4.4vw, 64px);
+  line-height: 1.35;
+}
+.escape__title--small {
+  font-size: 32px;
+}
+
+.escape__text {
+  margin: var(--space-5) 0 0;
+  color: var(--color-mist);
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.escape__score {
+  margin: var(--space-4) 0 0;
+  color: var(--color-gold);
+  font: 600 60px/1.35 var(--font-display);
+}
+.escape__breakdown {
+  margin: 0;
+  color: var(--color-mist);
+  font-size: 18px;
+  line-height: 1.35;
+}
+.escape__label {
+  text-transform: uppercase;
+}
+
+.escape__crew {
+  display: flex;
+  gap: var(--space-4);
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.escape__crew img {
+  display: block;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--color-forest);
+}
+
+.escape__primary {
+  width: var(--action-width);
+  max-width: 100%;
+  margin-top: var(--space-6);
+}
+
+.escape__new {
+  width: min(328px, 100%);
+  margin-right: var(--space-4);
+}
+
+@media (max-width: 560px) {
+  .escape__main {
+    justify-content: flex-end;
+    align-items: stretch;
+  }
+  .escape__card {
+    padding: var(--space-5);
+  }
+  .escape__crew img {
+    width: 56px;
+    height: 56px;
+  }
+  .escape__primary,
+  .escape__new {
+    width: 100%;
+    margin-right: 0;
+  }
+}

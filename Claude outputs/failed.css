@@ -1,0 +1,96 @@
+/* Page 22 — Expedition Failed. Figma 1440 x 900: river accident art, HUD, no navigation,
+   one centred card 1040 x 560 at (200, 184). */
+.failed .scene__art {
+  object-position: center;
+}
+
+.failed__card {
+  position: relative;
+  width: min(1040px, 100%);
+  margin: clamp(var(--space-5), 8vh, 72px) auto 0;
+  padding: var(--space-6) 40px 40px;
+  border-radius: var(--radius-card);
+  background: var(--color-ink);
+  box-shadow: 0 16px 40px rgb(0 0 0 / 35%);
+}
+
+.failed__eyebrow {
+  color: var(--color-coral);
+  font-size: 15px;
+}
+
+.failed__title {
+  margin: var(--space-4) 0 0;
+  font-size: clamp(36px, 3.9vw, 56px);
+  line-height: 1.35;
+}
+.failed__title--small {
+  font-size: 32px;
+}
+
+.failed__text {
+  margin: var(--space-5) 0 0;
+  color: var(--color-mist);
+  font-size: 23px;
+  line-height: 1.35;
+}
+
+.failed__hearts {
+  margin: var(--space-5) 0 0;
+  color: var(--color-paper);
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.35;
+}
+
+.failed__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-6);
+  margin-top: var(--space-7);
+}
+.failed__primary,
+.failed__rest {
+  width: var(--action-width);
+  max-width: 100%;
+}
+.failed__rest {
+  border-color: var(--color-reed);
+  background: var(--color-river);
+  color: var(--color-paper);
+}
+.failed__prepare {
+  min-height: var(--chip-height);
+  padding: 0 var(--space-4);
+  color: var(--color-water);
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.failed__note {
+  margin: var(--space-5) 0 0;
+  color: var(--color-mist);
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+@media (max-width: 560px) {
+  .failed__card {
+    padding: var(--space-5);
+  }
+  .failed__text {
+    font-size: 19px;
+  }
+  .failed__hearts {
+    font-size: 19px;
+  }
+  .failed__actions {
+    gap: var(--space-4);
+  }
+  .failed__primary,
+  .failed__rest,
+  .failed__prepare {
+    width: 100%;
+  }
+}

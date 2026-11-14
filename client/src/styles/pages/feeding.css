@@ -1,0 +1,500 @@
+/* Pages 11 Fish Pen and 12 Feeding Maths. Figma 1440 x 900, fish pen art.
+   11: four paper fish tiles (120) on the left, dark panel (472 x 600) on the right.
+   12: one paper card (1168 x 520) with the batch, the food supply box (#dfd2ad) and the answer. */
+.pen .scene__art,
+.feed .scene__art {
+  object-position: center;
+}
+
+/* ================= 11 Fish Pen ================= */
+.pen__main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 472px);
+  gap: var(--space-6);
+  padding-top: var(--space-5);
+}
+
+.pen__eyebrow {
+  font-size: 15px;
+}
+
+.pen__title {
+  margin: var(--space-1) 0 0;
+  font-size: clamp(30px, 2.9vw, 42px);
+  line-height: 1.35;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 45%);
+}
+
+.pen__fish {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-7);
+  margin: 176px 0 0 88px;
+  padding: 0;
+  list-style: none;
+}
+
+.pen__tile {
+  display: grid;
+  place-items: center;
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+}
+.pen__tile--empty {
+  border: 2px dashed rgb(244 232 204 / 70%);
+  background: rgb(16 37 49 / 55%);
+}
+.pen__tile-label {
+  color: var(--color-mist);
+  font-weight: 600;
+}
+
+.pen__panel {
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  min-height: 600px;
+  margin-top: 32px;
+  padding: var(--space-5);
+}
+
+.pen__panel-title {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.35;
+}
+
+.pen__counts,
+.pen__rules {
+  margin: var(--space-4) 0 0;
+  color: var(--color-mist);
+  font-size: 20px;
+  line-height: 1.35;
+  word-spacing: 2px;
+}
+.pen__rules {
+  margin-top: var(--space-6);
+}
+
+.pen__crate {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+  color: var(--color-mist);
+  font-size: 20px;
+  line-height: 1.35;
+}
+.pen__crate p {
+  margin: 0;
+}
+.pen__crate-tile {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+}
+
+.pen__panel .form-alert {
+  margin-top: var(--space-4);
+}
+
+.pen__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-5);
+}
+.pen__start {
+  width: var(--action-width);
+  max-width: 100%;
+}
+.pen__more {
+  color: var(--color-water);
+}
+
+/* ================= 12 Feeding Maths ================= */
+.feed__main {
+  padding-top: var(--space-5);
+}
+
+.feed__eyebrow {
+  font-size: 15px;
+}
+
+.feed__title {
+  margin: var(--space-1) 0 0;
+  font-size: clamp(30px, 2.9vw, 42px);
+  line-height: 1.35;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 45%);
+}
+
+.feed__card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 488px);
+  gap: var(--space-6) 40px;
+  max-width: 1168px;
+  margin: var(--space-3) auto 0;
+  padding: var(--space-5) var(--space-6) var(--space-6);
+  border-radius: var(--radius-card);
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.feed__batch-label {
+  margin: 0;
+  color: var(--color-wood);
+  font: 600 15px/1.35 var(--font-body);
+  text-transform: uppercase;
+}
+
+.feed__fish {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.feed__fish--happy li {
+  animation: feed-bob 900ms ease-in-out infinite alternate;
+}
+.feed__fish--happy li:nth-child(2) {
+  animation-delay: 150ms;
+}
+.feed__fish--happy li:nth-child(3) {
+  animation-delay: 300ms;
+}
+.feed__fish--happy li:nth-child(4) {
+  animation-delay: 450ms;
+}
+@keyframes feed-bob {
+  to {
+    transform: translateY(-10px) rotate(-4deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .feed__fish--happy li {
+    animation: none;
+  }
+}
+
+.feed__supply {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 164px;
+  padding: var(--space-5) var(--space-4);
+  border-radius: var(--radius-panel);
+  background: var(--color-sand);
+}
+.feed__supply-tile {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+}
+.feed__supply-title {
+  margin: 0;
+  font: 600 26px/1.35 var(--font-display);
+  font-variation-settings: 'SOFT' 0, 'WONK' 1;
+}
+.feed__supply-text {
+  margin: var(--space-2) 0 0;
+  color: var(--color-wood);
+  font-size: 20px;
+  line-height: 1.35;
+}
+.feed__supply-text + .feed__supply-text {
+  margin-top: 0;
+}
+
+/* Question + answer share the card's two columns. */
+.feed__question {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+}
+
+.feed__ask-text {
+  margin: 0;
+  font: 600 clamp(22px, 1.95vw, 28px) / 1.35 var(--font-body);
+}
+.feed__ask-hint {
+  margin: var(--space-6) 0 0;
+  color: var(--color-wood);
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.feed__answer {
+  padding-left: 40px;
+}
+
+.feed__inputs {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.feed__field {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.feed__label {
+  padding: 0;
+  color: var(--color-wood);
+  font: 600 17px/1.35 var(--font-body);
+}
+
+.feed__input {
+  width: 100%;
+  max-width: 416px;
+  min-height: 72px;
+  padding: 0 21px;
+  border: 3px solid var(--color-reed);
+  border-radius: var(--radius-control);
+  background: var(--color-cream-light);
+  color: var(--color-ink);
+  font: 600 28px/1.35 var(--font-body);
+}
+.feed__input:focus-visible {
+  outline: none;
+  border-color: var(--color-emerald);
+}
+.feed__input[aria-invalid='true'] {
+  border-color: var(--color-coral);
+}
+
+.feed__answer .field__error {
+  margin-top: var(--space-2);
+  color: #a3352f; /* darker coral: readable on paper */
+}
+
+.feed__submit {
+  width: var(--action-width);
+  max-width: 100%;
+  margin-top: 40px;
+}
+
+.feed__yesno {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.feed__yesno .btn {
+  width: min(100%, 416px);
+}
+.feed__yesno .feed__no {
+  background: var(--color-ink);
+}
+
+/* ---------- Results ---------- */
+.feed__result {
+  grid-column: 1 / -1;
+  padding: var(--space-5);
+  border-radius: var(--radius-panel);
+}
+.feed__result--reward {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  background: var(--color-sand);
+}
+.feed__result--wrong {
+  border-left: 6px solid var(--color-coral);
+  background: var(--color-cream-light);
+}
+
+.feed__chest {
+  width: 180px;
+  height: 180px;
+  border-radius: var(--radius-panel);
+  animation: feed-chest 600ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+@keyframes feed-chest {
+  from {
+    transform: scale(0.6) rotate(-6deg);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .feed__chest {
+    animation: none;
+  }
+}
+
+.feed__result-title {
+  margin: 0;
+  font: 600 26px/1.35 var(--font-display);
+  font-variation-settings: 'SOFT' 0, 'WONK' 1;
+}
+.feed__coins {
+  margin: var(--space-1) 0 0;
+  color: var(--color-wood);
+  font: 700 34px/1.2 var(--font-body);
+}
+.feed__result-text {
+  margin: var(--space-3) 0 var(--space-4);
+  font-size: 19px;
+  line-height: 1.4;
+}
+.feed__result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+.feed__result-actions .btn-secondary {
+  background: var(--color-ink);
+}
+
+.feed__steps {
+  margin: var(--space-3) 0 0;
+  padding-left: var(--space-5);
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+.feed__error {
+  grid-column: 1 / -1;
+  color: var(--color-ink);
+}
+
+/* ---------- Footer (no camp navigation here) ---------- */
+.feed__footer {
+  display: flex;
+  align-items: center;
+  gap: 72px;
+  margin-top: var(--space-5);
+}
+.feed__exit {
+  width: var(--action-width);
+}
+.feed__note {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.35;
+  text-shadow: 0 2px 8px rgb(0 0 0 / 60%);
+}
+
+.feed__status {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  max-width: 560px;
+  margin: var(--space-8) auto;
+  padding: var(--space-6);
+  border-radius: var(--radius-card);
+  background: var(--color-ink);
+  font-size: 18px;
+  text-align: center;
+}
+.feed__status p {
+  margin: 0;
+}
+.feed__status-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+/* ---------- Tablet and phone ---------- */
+@media (max-width: 1100px) {
+  .pen__main {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pen__fish {
+    gap: var(--space-4);
+    margin: var(--space-5) 0 0;
+  }
+  .pen__panel {
+    min-height: 0;
+    margin-top: 0;
+  }
+  .feed__card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .feed__question {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+  .feed__answer {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .pen__tile {
+    width: 72px;
+    height: 72px;
+  }
+  .pen__tile .sprite-icon {
+    width: 64px !important;
+    height: 64px !important;
+  }
+  .pen__start {
+    width: 100%;
+  }
+  .feed__card {
+    padding: var(--space-4);
+  }
+  .feed__fish {
+    gap: var(--space-2);
+  }
+  .feed__fish .sprite-icon {
+    width: 64px !important;
+    height: 64px !important;
+  }
+  .feed__supply {
+    min-height: 0;
+    padding: var(--space-3);
+  }
+  .feed__supply-tile {
+    width: 64px;
+    height: 64px;
+  }
+  .feed__supply-tile .sprite-icon {
+    width: 56px !important;
+    height: 56px !important;
+  }
+  .feed__inputs {
+    flex-direction: column;
+  }
+  .feed__submit,
+  .feed__exit {
+    width: 100%;
+  }
+  .feed__result--reward {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .feed__footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+}
+
+/* Keep "Exit feeding" at the bottom of the screen, like the Figma frame. */
+.feed .game__body {
+  display: flex;
+  flex-direction: column;
+}
+.feed__footer {
+  margin-top: auto;
+  padding-top: var(--space-5);
+}

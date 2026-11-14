@@ -1,0 +1,98 @@
+/* Form fields (Figma: "labelled input" — default, focus, error, disabled). */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.field__label {
+  color: var(--color-mist);
+  font: 600 16px/1.35 var(--font-body);
+}
+
+.field__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field__input {
+  width: 100%;
+  min-height: var(--button-height);
+  padding: 0 var(--space-4);
+  border: 2px solid transparent;
+  border-radius: var(--radius-control);
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font: 400 18px/1.35 var(--font-body);
+  transition: border-color var(--motion-fast);
+}
+.field__input::placeholder {
+  color: rgb(16 37 49 / 45%);
+}
+.field__input:focus-visible {
+  outline: none;
+  border-color: var(--color-water);
+  box-shadow: 0 0 0 3px rgb(69 196 192 / 35%);
+}
+.field__input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Password fields leave room for the Show/Hide button. */
+.field__control:has(.field__reveal) .field__input {
+  padding-right: 80px;
+}
+
+.field__reveal {
+  position: absolute;
+  right: var(--space-2);
+  min-width: 64px;
+  min-height: var(--tap-target);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-wood);
+  font: 600 16px/1.35 var(--font-body);
+  cursor: pointer;
+}
+.field__reveal:hover {
+  text-decoration: underline;
+}
+.field__reveal:focus-visible {
+  outline: 2px solid var(--color-wood);
+  outline-offset: -2px;
+}
+
+.field--invalid .field__input {
+  border-color: var(--color-coral);
+}
+
+.field__hint,
+.field__error {
+  margin: 0;
+  font: 400 15px/1.4 var(--font-body);
+}
+.field__hint {
+  color: var(--color-muted);
+}
+.field__error {
+  color: var(--color-coral);
+  font-weight: 600;
+}
+.field__error::before {
+  content: '⚠ ';
+}
+
+/* Whole-form message (for example "Email or password is incorrect.") */
+.form-alert {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-left: 4px solid var(--color-coral);
+  border-radius: 8px;
+  background: rgb(229 107 101 / 14%);
+  color: var(--color-paper);
+  font: 600 16px/1.4 var(--font-body);
+}

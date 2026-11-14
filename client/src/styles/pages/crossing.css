@@ -1,0 +1,261 @@
+/* Page 18 — Treasure-Counting Crossing. Figma 1440 x 900, gorge art:
+   pale picture card (824 x 480, #d6ebe1) on the left, dark answer panel (488 x 480) on the right,
+   four chips (Leave / Scout / Medic / status) along the bottom. No camp navigation.
+   The provider picture is 660 x 360 (11:6): it is shown whole, never cropped. */
+.cross .scene__art {
+  object-position: center;
+}
+
+.cross__main {
+  display: grid;
+  grid-template-columns: minmax(0, 824fr) minmax(0, 488fr);
+  grid-template-areas:
+    'head head'
+    'picture panel'
+    'footer footer';
+  column-gap: var(--space-6);
+  padding-top: var(--space-5);
+}
+
+.cross__head {
+  grid-area: head;
+}
+.cross__eyebrow {
+  font-size: 15px;
+}
+.cross__title {
+  margin: var(--space-1) 0 0;
+  font-size: clamp(30px, 2.9vw, 42px);
+  line-height: 1.35;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 50%);
+}
+
+/* ---------- Picture card ---------- */
+.cross__picture {
+  grid-area: picture;
+  display: flex;
+  flex-direction: column;
+  min-height: 480px;
+  margin-top: var(--space-5);
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--color-foam);
+  color: var(--color-river);
+}
+.cross__picture-label {
+  margin: 0;
+  font: 600 14px/1.35 var(--font-body);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.cross__frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 1;
+  margin-top: var(--space-4);
+}
+.cross__image {
+  display: block;
+  width: 100%;
+  max-width: 776px;
+  height: auto;
+  aspect-ratio: 660 / 360;
+  object-fit: contain; /* never crop: every fish and chest must stay visible */
+  border-radius: var(--radius-control);
+  background: #fff;
+}
+.cross__image--hidden {
+  visibility: hidden;
+}
+.cross__frame-state {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  text-align: center;
+  font-size: 18px;
+  line-height: 1.4;
+}
+.cross__frame-state p {
+  margin: 0;
+}
+
+/* ---------- Answer / outcome panel ---------- */
+.cross__panel {
+  grid-area: panel;
+  display: flex;
+  flex-direction: column;
+  min-height: 480px;
+  margin-top: var(--space-5);
+  padding: var(--space-5);
+}
+.cross__form,
+.cross__outcome {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.cross__panel-title {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.35;
+}
+.cross__meta {
+  margin: var(--space-4) 0 0;
+  color: var(--color-mist);
+  font-size: 20px;
+  line-height: 1.35;
+}
+.cross__timer--low {
+  color: var(--color-coral);
+  font-weight: 600;
+}
+
+.cross__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+.cross__field + .cross__field {
+  margin-top: var(--space-4);
+}
+.cross__label {
+  color: var(--color-mist);
+  font-weight: 600;
+  font-size: 17px;
+}
+.cross__input {
+  height: 64px;
+  padding: 0 20px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-control);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font: 400 20px/1.35 var(--font-body);
+}
+.cross__input::placeholder {
+  color: var(--color-ink);
+  opacity: 0.7;
+}
+.cross__input:focus-visible {
+  outline: 3px solid var(--color-emerald);
+  outline-offset: 2px;
+}
+.cross__input[aria-invalid='true'] {
+  border-color: var(--color-coral);
+}
+.cross__input[readonly] {
+  background: var(--color-sand);
+}
+.cross__hint {
+  color: var(--color-water);
+  font-size: 15px;
+}
+
+.cross__submit {
+  width: var(--action-width);
+  max-width: 100%;
+  margin-top: auto;
+}
+.cross__form .cross__submit {
+  margin-top: var(--space-6);
+}
+
+.cross__outcome-line {
+  margin: var(--space-3) 0 0;
+  color: var(--color-mist);
+  font-size: 19px;
+  line-height: 1.4;
+}
+.cross__outcome-line:first-of-type {
+  margin-top: var(--space-4);
+  color: var(--color-paper);
+}
+.cross__outcome .cross__submit {
+  margin-top: auto;
+  padding-top: 0;
+}
+.cross__outcome-line:last-of-type {
+  margin-bottom: var(--space-6);
+}
+
+.cross__error {
+  margin-top: var(--space-4);
+}
+
+/* ---------- Bottom chips ---------- */
+.cross__footer {
+  grid-area: footer;
+  display: grid;
+  grid-template-columns: 320fr 312fr 312fr 312fr;
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+}
+.cross__chip {
+  width: 100%;
+}
+.cross__chip:disabled {
+  color: var(--color-mist);
+  opacity: 1;
+  cursor: not-allowed;
+}
+.cross__chip--info {
+  display: flex;
+  align-items: center;
+  min-height: var(--chip-height);
+  margin: 0;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-control);
+  background: var(--color-ink);
+  color: var(--color-mist);
+  font-weight: 600;
+  font-size: 17px;
+}
+.cross__chip--on {
+  color: var(--color-water);
+}
+
+.cross__status {
+  max-width: 560px;
+  margin: var(--space-7) auto 0;
+  padding: var(--space-6);
+  border-radius: 20px;
+  background: var(--color-ink);
+  font-size: 18px;
+}
+.cross__status-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+@media (max-width: 1100px) {
+  .cross__main {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'head' 'picture' 'panel' 'footer';
+  }
+  .cross__picture,
+  .cross__panel {
+    min-height: 0;
+  }
+  .cross__footer {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+}
+
+@media (max-width: 560px) {
+  .cross__picture {
+    padding: var(--space-3);
+  }
+  .cross__footer {
+    grid-template-columns: 1fr;
+  }
+}

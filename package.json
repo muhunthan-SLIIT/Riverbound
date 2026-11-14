@@ -1,0 +1,31 @@
+{
+  "name": "riverbound",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Riverbound — Catch. Prepare. Reunite. Escape. A MERN river adventure game (Distributed Service Architecture, UOB).",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "workspaces": [
+    "shared",
+    "server",
+    "worker",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently -n server,worker,client -c yellow,magenta,cyan \"npm run dev -w @riverbound/server\" \"npm run dev -w @riverbound/worker\" \"npm run dev -w @riverbound/client\"",
+    "dev:server": "npm run dev -w @riverbound/server",
+    "dev:worker": "npm run dev -w @riverbound/worker",
+    "dev:client": "npm run dev -w @riverbound/client",
+    "test": "node --test \"shared/test/**/*.test.ts\" \"server/test/**/*.test.ts\" \"worker/test/**/*.test.ts\"",
+    "smoke": "npm run smoke -w @riverbound/server",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build": "npm run build -w @riverbound/client"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.0",
+    "concurrently": "^9.2.0",
+    "typescript": "^5.9.2"
+  }
+}

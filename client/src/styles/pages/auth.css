@@ -1,0 +1,150 @@
+/* Pages 03 Register and 04 Sign in. Figma 1440 x 900: welcome text on the left (x 72-800),
+   dark form card on the right (x 864, 504 wide, radius 24, 48px padding). */
+.auth {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 504px);
+  grid-template-rows: auto 1fr;
+  column-gap: var(--space-8);
+  padding: var(--space-6) var(--space-9) var(--space-6) var(--space-8);
+}
+
+.auth::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, rgb(7 59 58 / 55%) 0%, rgb(7 59 58 / 15%) 50%, transparent 70%);
+  pointer-events: none;
+}
+
+.auth__header {
+  grid-column: 1;
+  grid-row: 1;
+  margin-top: var(--space-2);
+}
+
+.auth__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-paper);
+  text-decoration: none;
+}
+
+.auth__wordmark {
+  font: 600 24px/1.35 var(--font-display);
+  font-variation-settings: 'SOFT' 0, 'WONK' 1;
+}
+
+.auth__intro {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: center;
+  padding: 0 0 var(--space-9) var(--space-4);
+}
+
+.auth__headline {
+  margin: 0 0 0 -8px;
+  font: 600 clamp(40px, 4.45vw, 64px) / 1.35 var(--font-display);
+  font-variation-settings: 'SOFT' 0, 'WONK' 1;
+  color: var(--color-paper);
+}
+
+.auth__subline {
+  margin: var(--space-4) 0 0;
+  font-size: clamp(18px, 1.7vw, 24px);
+  line-height: 1.35;
+}
+
+.auth__card {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: start;
+  margin-top: var(--space-5);
+  padding: var(--space-6) var(--space-7) var(--space-7);
+  border-radius: var(--radius-card);
+  background: var(--color-ink);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 30%);
+}
+
+.auth__card-title {
+  margin: 0;
+  font-size: 36px;
+  line-height: 1.35;
+}
+
+.auth__card-intro {
+  margin: var(--space-2) 0 0;
+  color: var(--color-mist);
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.auth__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.auth__submit {
+  width: var(--action-width);
+  max-width: 100%;
+  margin-top: var(--space-4);
+}
+
+.auth__links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+.auth__links .btn-chip {
+  color: var(--color-mist);
+}
+.auth__links .btn-chip strong {
+  color: var(--color-gold);
+  font-weight: 600;
+}
+
+/* ---------- Tablet and mobile ---------- */
+@media (max-width: 1024px) {
+  .auth {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    padding: var(--space-5);
+    row-gap: var(--space-5);
+  }
+  .auth::before {
+    background: linear-gradient(180deg, rgb(7 59 58 / 35%) 0%, rgb(16 37 49 / 85%) 60%);
+  }
+  .auth__intro {
+    padding: var(--space-5) 0 0;
+  }
+  .auth__card {
+    grid-column: 1;
+    grid-row: 3;
+    width: min(100%, 504px);
+    justify-self: center;
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth__wordmark {
+    font-size: 20px;
+  }
+  .auth__brand img {
+    width: 48px;
+    height: 48px;
+  }
+  .auth__card {
+    padding: var(--space-5);
+  }
+  .auth__card-title {
+    font-size: 30px;
+  }
+  .auth__submit {
+    width: 100%;
+  }
+}

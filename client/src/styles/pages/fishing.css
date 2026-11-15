@@ -163,7 +163,6 @@
 }
 .fishing__continue--ready {
   border-color: var(--color-gold);
-  color: var(--color-gold);
 }
 
 /* ---------- Tablet and phone ---------- */
@@ -205,4 +204,177 @@
   .fishing__loadout {
     width: 100%;
   }
+}
+
+/* ---------- Net-casting animation (presentation only) ----------
+   The SVG covers the scene exactly like the painting (same 1440 x 900 coordinates, cover + centre),
+   so the net starts at the explorer's hands. It sits above the painting and below the panels. */
+.fishing .game__body {
+  position: static; /* lets the animation layer cover the whole scene */
+}
+.netcast {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* The net rotates around the explorer's hands (925, 655 in the painting). */
+.netcast__net {
+  transform-box: view-box;
+  transform-origin: 925px 655px;
+}
+.netcast__pole {
+  stroke: #694632;
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+.netcast__hoop {
+  fill: none;
+  stroke: #3b2a1e;
+  stroke-width: 5;
+}
+.netcast__bag {
+  stroke: rgb(244 232 204 / 70%);
+  stroke-width: 1.5;
+}
+
+/* 1. Cast: swing from raised (behind the shoulder) down into the water. */
+.netcast--cast .netcast__net {
+  animation: net-cast 700ms cubic-bezier(0.55, 0, 0.75, 0.4) both;
+}
+@keyframes net-cast {
+  0% { transform: rotate(72deg); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: rotate(0deg); opacity: 1; }
+}
+
+/* 2. Wait: the net bobs gently in the water; the bag looks submerged. */
+.netcast--wait .netcast__net {
+  animation: net-bob 900ms ease-in-out infinite alternate;
+}
+.netcast--wait .netcast__bag {
+  opacity: 0.35;
+}
+@keyframes net-bob {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-3deg) translateY(4px); }
+}
+
+/* 3. Lift: up out of the water (with the fish if the server confirmed it). */
+.netcast--lift .netcast__net,
+.netcast--missed .netcast__net {
+  animation: net-lift 650ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+@keyframes net-lift {
+  from { transform: rotate(-3deg) translateY(4px); }
+  to { transform: rotate(32deg); }
+}
+/* 4. Caught: hold the net up, then fade it away. */
+.netcast--caught .netcast__net {
+  transform: rotate(32deg);
+  animation: net-fade 900ms ease-in both;
+}
+.netcast--missed .netcast__net {
+  animation: net-lift 650ms cubic-bezier(0.2, 0.7, 0.3, 1) both, net-fade 900ms ease-in both;
+}
+@keyframes net-fade {
+  0%, 60% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* The fish wriggles in the net. */
+.netcast__fish {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.netcast__fish > * {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fish-wriggle 260ms ease-in-out infinite alternate;
+}
+@keyframes fish-wriggle {
+  from { transform: rotate(-10deg); }
+  to { transform: rotate(10deg); }
+}
+
+/* Ripples spread where the net enters the water. */
+.netcast__ripple {
+  fill: none;
+  stroke: rgb(255 255 255 / 75%);
+  stroke-width: 2.5;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.netcast--wait .netcast__ripple,
+.netcast--lift .netcast__ripple,
+.netcast--missed .netcast__ripple {
+  animation: ripple 1.4s ease-out infinite;
+}
+.netcast__ripple--1 { animation-delay: 0.35s !important; }
+.netcast__ripple--2 { animation-delay: 0.7s !important; }
+@keyframes ripple {
+  from { opacity: 0.9; transform: scale(1); }
+  to { opacity: 0; transform: scale(5); }
+}
+
+/* Splash droplets when the net hits the water. */
+.netcast__drop {
+  fill: rgb(255 255 255 / 90%);
+  opacity: 0;
+}
+.netcast--wait .netcast__drop {
+  animation: drop-up 600ms ease-out both;
+}
+.netcast__drop--0 { --dx: -18px; }
+.netcast__drop--1 { --dx: -8px; }
+.netcast__drop--2 { --dx: 0px; }
+.netcast__drop--3 { --dx: 10px; }
+.netcast__drop--4 { --dx: 20px; }
+@keyframes drop-up {
+  0% { opacity: 1; transform: translate(0, 0); }
+  50% { opacity: 1; transform: translate(var(--dx), -38px); }
+  100% { opacity: 0; transform: translate(calc(var(--dx) * 1.6), 6px); }
+}
+
+/* Water dripping from the lifted net. */
+.netcast__drip {
+  fill: rgb(220 245 250 / 90%);
+  opacity: 0;
+  animation: drip 700ms ease-in infinite;
+}
+.netcast__drip--1 { animation-delay: 0.2s; }
+.netcast__drip--2 { animation-delay: 0.4s; }
+@keyframes drip {
+  0% { opacity: 0; transform: translate(-30px, -80px); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-30px, 10px); }
+}
+
+/* "+1 fish" floats up. */
+.netcast__plus {
+  fill: var(--color-gold);
+  stroke: var(--color-ink);
+  stroke-width: 5px;
+  paint-order: stroke;
+  font: 700 34px var(--font-body);
+  animation: plus-rise 900ms ease-out both;
+}
+@keyframes plus-rise {
+  from { opacity: 0; transform: translateY(20px); }
+  25% { opacity: 1; }
+  to { opacity: 1; transform: translateY(-24px); }
+}
+
+/* Ready to feed: the Continue button becomes the main (gold) action. */
+.fishing__continue.btn-primary {
+  animation: ready-pulse 1.8s ease-in-out 2;
+}
+@keyframes ready-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(242 189 82 / 0%); }
+  50% { box-shadow: 0 0 0 8px rgb(242 189 82 / 35%); }
 }

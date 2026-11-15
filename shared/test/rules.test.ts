@@ -5,6 +5,8 @@ import {
   FEEDING_TYPES,
   TYPES_BY_DIFFICULTY,
   CATCH_YIELD,
+  perfectRate,
+  rankLeaderboard,
   SHOP_ITEMS,
   contentFitsRegion,
   correctAnswer,
@@ -176,4 +178,31 @@ test('route status and missing gear', async () => {
   assert.equal(routeStatus('reed_marsh', ['shallow_bend']), 'available');
   assert.deepEqual(missingGear('shallow_bend', ['river_map', 'compass']), ['swimming_goggles', 'swimming_outfit']);
   assert.deepEqual(missingGear('reed_marsh', ['river_map', 'compass', 'swimming_goggles', 'swimming_outfit']), ['life_jacket']);
+});
+
+test('leaderboard: higher score first, then whoever finished first', () => {
+  const rows = [
+    { ownerId: 'a', score: 500, finishedAt: 30 },
+    { ownerId: 'b', score: 900, finishedAt: 50 },
+    { ownerId: 'c', score: 500, finishedAt: 10 },
+  ];
+  assert.deepEqual(
+    rankLeaderboard(rows).map((r) => [r.rank, r.ownerId]),
+    [[1, 'b'], [2, 'c'], [3, 'a']],
+  );
+});
+
+test('leaderboard: one row per account (its best finished journey)', () => {
+  const ranked = rankLeaderboard([
+    { ownerId: 'a', score: 1500, finishedAt: 1 },
+    { ownerId: 'a', score: 2100, finishedAt: 2 },
+    { ownerId: 'b', score: 1800, finishedAt: 3 },
+  ]);
+  assert.deepEqual(ranked.map((r) => [r.ownerId, r.score]), [['a', 2100], ['b', 1800]]);
+});
+
+test('leaderboard: perfect rate is a whole percentage, or null with no answers', () => {
+  assert.equal(perfectRate(0, 0), null);
+  assert.equal(perfectRate(13, 15), 87);
+  assert.equal(perfectRate(15, 15), 100);
 });

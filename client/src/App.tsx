@@ -20,6 +20,7 @@ import { RiverMapPage } from './pages/RiverMapPage.tsx';
 import { RouteDetailsPage } from './pages/RouteDetailsPage.tsx';
 import { CrossingPage } from './pages/CrossingPage.tsx';
 import { RescuePage } from './pages/RescuePage.tsx';
+import { LeaderboardPage } from './pages/LeaderboardPage.tsx';
 import { TeamJournalPage } from './pages/TeamJournalPage.tsx';
 import { CheckpointPage } from './pages/CheckpointPage.tsx';
 import { ExpeditionFailedPage } from './pages/ExpeditionFailedPage.tsx';
@@ -57,6 +58,7 @@ export function App() {
           <Route path="crossing/:challengeId" element={<CrossingPage />} />
           <Route path="rescue/:companionId" element={<RescuePage />} />
           <Route path="team" element={<TeamJournalPage />} />
+          <Route path="leaderboard" element={<LeaderboardPage />} />
           <Route path="checkpoint" element={<CheckpointPage />} />
           <Route path="failed" element={<ExpeditionFailedPage />} />
           <Route path="complete" element={<EscapeSummaryPage />} />

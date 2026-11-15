@@ -179,6 +179,14 @@ async function crossingTests(id: string, startCampaign: CampaignDTO) {
   assert.equal(summary.coinsEarned, campaign.totals.crossingLoot);
   assert.equal(summary.walletAfter, campaign.coins);
 
+  step('leaderboard lists finished players only, with public data only');
+  const board = await call('GET', '/leaderboard');
+  assert.equal(board.status, 200);
+  // This test player has not finished the game, so they are not on the board yet.
+  assert.equal((board.data as { you: unknown }).you, null);
+  const boardJson = JSON.stringify(board.data);
+  assert.ok(!boardJson.includes('@') && !boardJson.includes(id), 'no email or campaign ID on the leaderboard');
+
   step('a cleared route cannot be started again');
   assert.equal((await call('POST', `/campaigns/${id}/route/start`, { regionId: 'shallow_bend', timed: false })).status, 409);
 

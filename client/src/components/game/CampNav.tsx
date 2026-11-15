@@ -1,4 +1,4 @@
-// The 8-item camp navigation bar (Figma "Camp navigation"). On phones it becomes a "Menu" sheet.
+// The camp navigation bar (Figma "Camp navigation", plus Leaderboard). On phones it becomes a "Menu" sheet.
 import { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { paths } from '../../routes/paths.ts';
@@ -14,6 +14,7 @@ const ITEMS: Item[] = [
   { label: 'Equipment', to: paths.equipment },
   { label: 'River Map', to: paths.map },
   { label: 'Crew', to: paths.team },
+  { label: 'Leaderboard', to: paths.leaderboard },
 ];
 
 export function CampNav({ campaignId }: { campaignId: string }) {

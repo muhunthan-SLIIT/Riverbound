@@ -35,6 +35,7 @@ export function buildRoutes(env: Env): Router {
   // Everything below needs a signed-in player
   router.use(requireAuth, gameLimit);
 
+  router.get('/leaderboard', g.leaderboard);
   router.get('/campaigns', g.listCampaigns);
   router.post('/campaigns', g.createCampaign);
   router.get('/campaigns/:id', g.getCampaign);

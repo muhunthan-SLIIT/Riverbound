@@ -2,6 +2,7 @@
 export * from './rules/constants.ts';
 export * from './rules/shop.ts';
 export * from './rules/fishing.ts';
+export * from './rules/leaderboard.ts';
 export * from './rules/random.ts';
 export * from './rules/feeding.ts';
 export * from './rules/regions.ts';
@@ -20,6 +21,8 @@ export type {
   CrossingLogDTO,
   RegionResultDTO,
   ExpeditionDTO,
+  LeaderboardDTO,
+  LeaderboardEntryDTO,
   FeedingChallengeDTO,
   InventoryDTO,
   ShopItemDTO,

@@ -64,6 +64,8 @@ export interface ICampaign {
   }[];
   // "shallow_bend:0" style keys: crossings that already paid coins/points. Never paid twice, even after a failure.
   rewardedEncounters: string[];
+  // When the score last went up: breaks leaderboard ties (whoever reached the score first ranks higher).
+  scoreReachedAt: Date | null;
   scoutUsedRegions: RegionId[];
   createdAt: Date;
   updatedAt: Date;
@@ -157,6 +159,7 @@ const campaignSchema = new Schema<ICampaign>(
       default: [],
     },
     rewardedEncounters: { type: [String], default: [] },
+    scoreReachedAt: { type: Date, default: null },
     scoutUsedRegions: { type: [String], default: [] },
   },
   // optimisticConcurrency: if two browser tabs save the same campaign at once, the second save fails safely.
@@ -165,6 +168,9 @@ const campaignSchema = new Schema<ICampaign>(
 
 // Only ONE unfinished campaign per account (enforced by the database itself).
 campaignSchema.index({ owner: 1 }, { unique: true, partialFilterExpression: { unfinished: true }, name: 'one_unfinished_per_owner' });
+
+// Leaderboard: find journeys that count (not abandoned) in score order quickly.
+campaignSchema.index({ state: 1, score: -1 });
 
 export const Campaign = model<ICampaign>('Campaign', campaignSchema);
 export type CampaignDoc = HydratedDocument<ICampaign>;

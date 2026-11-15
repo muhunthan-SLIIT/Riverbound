@@ -20,6 +20,8 @@
   --color-sand: #dfd2ad; /* food-supply box on paper cards */
   --color-cream-light: #fffbf0; /* answer input on paper */
   --color-foam: #d6ebe1; /* crossing picture card */
+  --color-silver: #c9d3d6; /* leaderboard rank 2 */
+  --color-bronze: #d39a6a; /* leaderboard rank 3 */
   --color-forest: #0e4f47; /* highlighted dark card (fed stock, shop shelf) */
   --scrim-ink: rgb(16 37 49 / 58%); /* dark layer over artwork so text stays readable */
 

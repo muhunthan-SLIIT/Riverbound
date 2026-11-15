@@ -7,6 +7,7 @@ import * as campaigns from '../services/campaign.service.ts';
 import * as challenges from '../services/challenge.service.ts';
 import * as crossing from '../services/crossing.service.ts';
 import * as feeding from '../services/feeding.service.ts';
+import { getLeaderboard } from '../services/leaderboard.service.ts';
 import { listSounds } from '../services/sound.service.ts';
 import { asObject, requireActionKey, requireObjectId } from '../utils/validate.ts';
 
@@ -21,6 +22,9 @@ function actionIds(req: Request, res: Response) {
 
 export const gameController = {
   // ----- campaigns -----
+  async leaderboard(_req: Request, res: Response) {
+    res.json(await getLeaderboard(currentUserId(res)));
+  },
   async listCampaigns(_req: Request, res: Response) {
     res.json({ campaigns: await campaigns.listCampaigns(currentUserId(res)) });
   },

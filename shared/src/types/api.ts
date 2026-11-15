@@ -141,3 +141,20 @@ export type SoundDTO = {
 };
 
 export type ApiErrorBody = { error: { code: string; message: string } };
+
+/** One row of the leaderboard (finished journeys only). Only public game data: never an email or account ID. */
+export type LeaderboardEntryDTO = {
+  rank: number;
+  explorerName: string;
+  character: CharacterId;
+  score: number;
+  perfectRate: number | null; // % of crossing answers with both counts right
+  finishedAt: string; // ISO date when the player reached the rescue dock
+  isYou: boolean;
+};
+
+export type LeaderboardDTO = {
+  entries: LeaderboardEntryDTO[]; // the top rows
+  you: LeaderboardEntryDTO | null; // your best finished journey, or null if you have not finished yet
+  totalPlayers: number; // players who have finished
+};

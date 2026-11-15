@@ -7,6 +7,7 @@ import type {
   CrossingAnswerResult,
   CrossingChallengeDTO,
   FeedingAnswer,
+  LeaderboardDTO,
   FeedingChallengeDTO,
   ItemId,
   RegionId,
@@ -78,6 +79,10 @@ export const crossingApi = {
   useCompanion: (id: string, companion: CompanionId, key?: string) =>
     api.post<{ hintFish: number | null; challenge: CrossingChallengeDTO | null; campaign: CampaignDTO }>(`/campaigns/${id}/companions/${companion}/use`, {}, key),
   returnToCamp: (id: string, key?: string) => api.post<CampaignResponse>(`/campaigns/${id}/return-to-camp`, {}, key),
+};
+
+export const leaderboardApi = {
+  get: (signal?: AbortSignal) => api.get<LeaderboardDTO>('/leaderboard', signal),
 };
 
 export const soundApi = {

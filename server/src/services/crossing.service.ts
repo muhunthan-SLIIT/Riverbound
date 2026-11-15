@@ -185,6 +185,7 @@ function clearRegion(c: CampaignDoc, regionId: RegionId, now: Date) {
   const region = getRegion(regionId);
   const bonusPoints = c.hearts * POINTS_PER_HEART_REGION_BONUS;
   c.score += bonusPoints;
+  if (bonusPoints > 0) c.scoreReachedAt = now;
   // Saved once, when the region is cleared: the Region Complete page reads it, nothing is recalculated.
   const log = c.expedition?.log ?? [];
   const coinsEarned = log.reduce((sum, x) => sum + x.coins, 0);
@@ -260,6 +261,7 @@ export async function answerCrossing(
     c.coins += coinsAwarded;
     c.totals.crossingLoot += coinsAwarded;
     c.score += pointsAwarded;
+    if (pointsAwarded > 0) c.scoreReachedAt = now;
     const heartsLost = c.hearts - outcome.heartsAfter;
     c.hearts = outcome.heartsAfter;
 

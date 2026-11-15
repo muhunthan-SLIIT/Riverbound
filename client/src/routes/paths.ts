@@ -22,6 +22,7 @@ export const paths = {
   crossing: (id: string, challengeId: string) => `/campaigns/${id}/crossing/${challengeId}`,
   rescue: (id: string, companionId: string) => `/campaigns/${id}/rescue/${companionId}`,
   team: (id: string) => `/campaigns/${id}/team`,
+  leaderboard: (id: string) => `/campaigns/${id}/leaderboard`,
   checkpoint: (id: string) => `/campaigns/${id}/checkpoint`,
   failed: (id: string) => `/campaigns/${id}/failed`,
   complete: (id: string) => `/campaigns/${id}/complete`,

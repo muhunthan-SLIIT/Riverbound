@@ -8,7 +8,7 @@
 // and an empty net comes up if it failed. With reduced motion the catch is shown instantly instead.
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CATCH_MAX, CATCH_MIN, FEED_BATCH_SIZE, type CampaignDTO } from '@riverbound/shared';
+import { CATCH_MAX, CATCH_MIN, FEED_MIN_UNFED, type CampaignDTO } from '@riverbound/shared';
 import { GameLayout } from '../components/game/GameLayout.tsx';
 import { NET_TIMING, NetCastAnimation, prefersReducedMotion, type NetPhase } from '../components/game/NetCastAnimation.tsx';
 import { SpriteIcon } from '../components/SpriteIcon.tsx';
@@ -44,9 +44,9 @@ function FishingContent({ campaign: c, setCampaign }: { campaign: CampaignDTO; s
 
   const inv = c.inventory;
   const blocked = c.state !== 'at_camp' || c.activeFeedingBatchId !== null || c.activeChallengeId !== null;
-  const batchProgress = Math.min(inv.unfedAvailable, FEED_BATCH_SIZE);
-  const readyToFeed = inv.unfedAvailable >= FEED_BATCH_SIZE;
-  const missing = FEED_BATCH_SIZE - batchProgress;
+  const batchProgress = Math.min(inv.unfedAvailable, FEED_MIN_UNFED);
+  const readyToFeed = inv.unfedAvailable >= FEED_MIN_UNFED;
+  const missing = FEED_MIN_UNFED - batchProgress;
   const busy = state.kind === 'pending' || phase !== 'idle';
 
   const doCatch = async () => {
@@ -123,7 +123,7 @@ function FishingContent({ campaign: c, setCampaign }: { campaign: CampaignDTO; s
           <div>
             <dt>Feeding batch:</dt>
             <dd>
-              {batchProgress} / {FEED_BATCH_SIZE}
+              {batchProgress} / {FEED_MIN_UNFED}
             </dd>
           </div>
         </dl>
@@ -160,7 +160,7 @@ function FishingContent({ campaign: c, setCampaign }: { campaign: CampaignDTO; s
           </Link>
           {readyToFeed && (
             <span id="feed-ready" className="visually-hidden">
-              You have {inv.unfedAvailable} unfed fish. A feeding batch needs {FEED_BATCH_SIZE}.
+              You have {inv.unfedAvailable} unfed fish. You need {FEED_MIN_UNFED} to start feeding.
             </span>
           )}
           {!readyToFeed && (
@@ -234,7 +234,7 @@ function StatusText({
           </>
         ) : (
           <>
-            Caught {state.caught} unfed fish · Batch {batchProgress} / {FEED_BATCH_SIZE}
+            Caught {state.caught} unfed fish · Batch {batchProgress} / {FEED_MIN_UNFED}
           </>
         )}
       </p>

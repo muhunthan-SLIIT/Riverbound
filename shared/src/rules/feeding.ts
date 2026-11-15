@@ -1,7 +1,9 @@
 // Feeding maths: question generation, answer checking and worked solutions.
-// F = fish (always 4), C = crates, P = pellets per crate, N = pellets each fish needs, T = C * P.
-import { FEED_BATCH_SIZE } from './constants.ts';
-import { pick, randomInt, type Rng } from './random.ts';
+// Rules v2.5: the numbers come from a Fish API puzzle.
+//   F = the puzzle's fish count (= the fish you reserve), C = the puzzle's chest count (food chests),
+//   P = pellets per chest, N = pellets each fish needs (both chosen by the server), T = C * P.
+// The server chooses P and N so that every answer is a whole number.
+import { pick, shuffle, type Rng } from './random.ts';
 
 export const FEEDING_TYPES = [
   'total_food',
@@ -64,7 +66,7 @@ export function isValidFor(type: FeedingType, p: FeedingParams): boolean {
 }
 
 function questionText(type: FeedingType, p: FeedingParams): string {
-  const base = `You have ${p.fish} fish and ${p.crates} food crate${p.crates === 1 ? '' : 's'}. Each crate holds ${p.perCrate} pellets.`;
+  const base = `You have ${p.fish} fish and ${p.crates} food chest${p.crates === 1 ? '' : 's'}. Each chest holds ${p.perCrate} pellets.`;
   const need = ` Each fish needs ${p.needPerFish} pellets.`;
   switch (type) {
     case 'total_food':
@@ -78,7 +80,7 @@ function questionText(type: FeedingType, p: FeedingParams): string {
     case 'share_remainder':
       return `${base} Share the pellets equally in whole pellets. How many does each fish get, and how many are left over?`;
     case 'extra_crates':
-      return `${base}${need} How many more crates do you need so every fish is fed?`;
+      return `${base}${need} How many more chests do you need so every fish is fed?`;
   }
 }
 
@@ -87,21 +89,31 @@ export function makeQuestion(type: FeedingType, params: FeedingParams): FeedingQ
   return { type, params, answerKind: answerKindFor(type), text: questionText(type, params) };
 }
 
-/** Creates a fresh, always-valid question. Tries random numbers until they fit the chosen type. */
-export function generateQuestion(rng: Rng, difficulty: FeedingDifficulty): FeedingQuestion {
-  const type = pick(rng, TYPES_BY_DIFFICULTY[difficulty]);
-  const small = difficulty === 'easy';
-  for (let attempt = 0; attempt < 500; attempt += 1) {
-    const params: FeedingParams = {
-      fish: FEED_BATCH_SIZE,
-      crates: randomInt(rng, 1, small ? 4 : 6),
-      perCrate: randomInt(rng, 4, small ? 8 : 12),
-      needPerFish: randomInt(rng, 1, 12),
-    };
-    if (isValidFor(type, params)) return makeQuestion(type, params);
+/** Pellets per chest and pellets each fish needs are chosen from this range. */
+const PELLET_MIN = 1;
+const PELLET_MAX = 12;
+
+/**
+ * Builds a question from a Fish API puzzle: fish = the puzzle's fish count, chests = its chest count.
+ * Tries the difficulty's question types in random order and picks random pellet numbers that make
+ * the answer a whole number (and make the question sensible, e.g. a remainder question has a remainder).
+ * Falls back to "total food", which is valid for any numbers.
+ */
+export function generateQuestionFromPuzzle(rng: Rng, difficulty: FeedingDifficulty, fish: number, chests: number): FeedingQuestion {
+  if (!Number.isInteger(fish) || fish < 1 || !Number.isInteger(chests) || chests < 1) {
+    throw new Error(`Puzzle counts must be whole numbers of at least 1 (fish ${fish}, chests ${chests})`);
   }
-  // Fallback that is valid for every type except remainder/extra-crate checks; keep the type safe.
-  return makeQuestion('total_food', { fish: FEED_BATCH_SIZE, crates: 2, perCrate: 12, needPerFish: 6 });
+  for (const type of shuffle(rng, TYPES_BY_DIFFICULTY[difficulty])) {
+    const options: FeedingParams[] = [];
+    for (let perCrate = PELLET_MIN; perCrate <= PELLET_MAX; perCrate += 1) {
+      for (let needPerFish = PELLET_MIN; needPerFish <= PELLET_MAX; needPerFish += 1) {
+        const params = { fish, crates: chests, perCrate, needPerFish };
+        if (isValidFor(type, params)) options.push(params);
+      }
+    }
+    if (options.length > 0) return makeQuestion(type, pick(rng, options));
+  }
+  return makeQuestion('total_food', { fish, crates: chests, perCrate: 1 + Math.floor(rng() * PELLET_MAX), needPerFish: 1 });
 }
 
 export function correctAnswer(q: FeedingQuestion): FeedingAnswer {
@@ -152,7 +164,7 @@ export function workedSolution(q: FeedingQuestion): string[] {
   const p = q.params;
   const total = p.crates * p.perCrate;
   const need = p.fish * p.needPerFish;
-  const steps = [`Total pellets = ${p.crates} crates × ${p.perCrate} = ${total}.`];
+  const steps = [`Total pellets = ${p.crates} ${p.crates === 1 ? 'chest' : 'chests'} × ${p.perCrate} = ${total}.`];
   switch (q.type) {
     case 'total_food':
       break;
@@ -174,7 +186,7 @@ export function workedSolution(q: FeedingQuestion): string[] {
       const missing = need - total;
       steps.push(`Pellets needed = ${p.fish} × ${p.needPerFish} = ${need}.`);
       steps.push(`Missing pellets = ${need} − ${total} = ${missing}.`);
-      steps.push(`Extra crates = ${missing} ÷ ${p.perCrate}, rounded up = ${Math.ceil(missing / p.perCrate)}.`);
+      steps.push(`Extra chests = ${missing} ÷ ${p.perCrate}, rounded up = ${Math.ceil(missing / p.perCrate)}.`);
       break;
     }
   }

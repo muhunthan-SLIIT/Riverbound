@@ -90,7 +90,7 @@ export const gameController = {
     res.json(await challenges.answerAnyChallenge(requireObjectId(req.params.challengeId), currentUserId(res), key, req.body));
   },
   async challengeImage(req: Request, res: Response) {
-    const { image, imageType } = await crossing.getCrossingImage(requireObjectId(req.params.challengeId), currentUserId(res));
+    const { image, imageType } = await crossing.getChallengeImage(requireObjectId(req.params.challengeId), currentUserId(res));
     // Private and not cached: the picture belongs to this player's open puzzle.
     res.set({ 'Content-Type': imageType, 'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff' });
     if (imageType === 'image/svg+xml') res.set('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'");

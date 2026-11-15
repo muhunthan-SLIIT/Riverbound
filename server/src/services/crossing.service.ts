@@ -27,6 +27,7 @@ import {
 import { Challenge, Content, type CampaignDoc, type ChallengeDoc, type ContentDoc } from '../models/index.ts';
 import { AppError, badRequest, conflict, notFound } from '../utils/errors.ts';
 import { looksLikeImage } from '../utils/image.ts';
+import { claimPuzzle } from './content.service.ts';
 import { runAction } from './action.service.ts';
 import { assertAtCampAndFree, loadOwnedCampaign } from './campaign.service.ts';
 import { toCampaignDTO, toCrossingChallengeDTO } from './dto.ts';
@@ -45,35 +46,22 @@ function noPuzzles(): AppError {
   return new AppError(503, 'NO_PUZZLES', 'River puzzles are still being prepared. Please try again in a minute. Nothing was lost.');
 }
 
-/**
- * Picks a picture whose counts fit the region's limits (v2.2: chest max 4/5/6, fish 1-12),
- * preferring pictures this campaign has never seen.
- */
-async function pickContent(c: CampaignDoc, regionId: RegionId, session: ClientSession, exclude: Types.ObjectId[] = []) {
-  const region = getRegion(regionId);
-  const fits = { status: 'ready', fishCount: { $gte: 1, $lte: region.fishMax }, chestCount: { $gte: 1, $lte: region.chestMax } };
-  const seen = (await Challenge.distinct('content', { campaign: c._id, type: 'crossing' }).session(session)) as Types.ObjectId[];
-
-  for (const avoid of [[...seen, ...exclude], exclude]) {
-    const [picked] = await Content.aggregate<{ _id: Types.ObjectId }>([
-      { $match: { ...fits, _id: { $nin: avoid } } },
-      { $sample: { size: 1 } },
-      { $project: { _id: 1 } },
-    ]).session(session);
-    if (picked) return picked._id;
-  }
-  return null;
-}
-
 async function issueCrossing(c: CampaignDoc, session: ClientSession, now: Date, exclude: Types.ObjectId[] = []): Promise<{ challenge: ChallengeDoc; content: ContentDoc }> {
   const exp = c.expedition;
   if (!exp) throw new Error('No expedition');
-  const contentId = await pickContent(c, exp.regionId, session, exclude);
-  if (!contentId) throw noPuzzles();
-  const content = await Content.findById(contentId).select('fishCount chestCount').session(session);
+  // Region limits (v2.2: chest max 4/5/6, fish 1-12); never a puzzle already used for feeding.
+  const regionRules = getRegion(exp.regionId);
+  const content = await claimPuzzle({
+    campaignId: c._id,
+    use: 'crossing',
+    fishMax: regionRules.fishMax,
+    chestMax: regionRules.chestMax,
+    session,
+    exclude,
+  });
   if (!content) throw noPuzzles();
+  const contentId = content._id;
 
-  const region = getRegion(exp.regionId);
   const [challenge] = await Challenge.create(
     [
       {
@@ -84,7 +72,7 @@ async function issueCrossing(c: CampaignDoc, session: ClientSession, now: Date, 
         region: exp.regionId,
         encounterIndex: exp.encounterIndex,
         timed: exp.timed,
-        deadline: exp.timed ? new Date(now.getTime() + region.timerSeconds * 1000) : null,
+        deadline: exp.timed ? new Date(now.getTime() + regionRules.timerSeconds * 1000) : null,
       },
     ],
     { session },
@@ -168,9 +156,13 @@ export async function getCrossing(challengeId: Types.ObjectId, ownerId: Types.Ob
   return toCrossingChallengeDTO(ch, await loadContentCounts(ch));
 }
 
-/** The picture bytes, served from our own URL so the provider's file name (which holds the answers) stays hidden. */
-export async function getCrossingImage(challengeId: Types.ObjectId, ownerId: Types.ObjectId): Promise<{ image: Buffer; imageType: string }> {
-  const ch = await loadOwnedCrossing(challengeId, ownerId);
+/**
+ * The picture of a crossing OR a feeding question (rules v2.5), served from our own URL so the
+ * provider's file name (which holds the answers) stays hidden. Only the challenge's owner can load it.
+ */
+export async function getChallengeImage(challengeId: Types.ObjectId, ownerId: Types.ObjectId): Promise<{ image: Buffer; imageType: string }> {
+  const ch = await Challenge.findOne({ _id: challengeId, owner: ownerId }).select('content');
+  if (!ch?.content) throw notFound();
   const content = await Content.findById(ch.content).select('image imageType');
   if (!content || !looksLikeImage(content.image, content.imageType)) {
     throw new AppError(503, 'CONTENT_BROKEN', 'This river picture could not be loaded.');

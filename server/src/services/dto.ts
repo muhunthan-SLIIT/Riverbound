@@ -89,6 +89,8 @@ export function toFeedingChallengeDTO(ch: ChallengeDoc): FeedingChallengeDTO {
     batchId: ch.batch.toString(),
     // params are safe to show: the player needs them to draw the fish and crates. The answer is not included.
     question: { type: q.type, text: q.text, answerKind: q.answerKind, params: q.params },
+    // v2.5: the Fish API picture this question is built from (served from our own URL, owner only).
+    imageUrl: ch.content ? `/api/challenges/${ch._id.toString()}/image` : null,
     status,
     workedSolution: ch.status === 'wrong' ? workedSolution(q) : null,
   };

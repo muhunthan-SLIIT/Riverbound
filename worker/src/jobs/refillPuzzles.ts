@@ -21,7 +21,8 @@ async function fetchWithRetry(baseUrl: string, maxRetries: number) {
 }
 
 export async function refillPuzzles(options: RefillOptions): Promise<{ added: number; message: string }> {
-  const ready = await Content.countDocuments({ source: 'fish_api', status: 'ready' });
+  // Only puzzles not yet handed out count: feeding and crossings each claim puzzles for good (v2.5).
+  const ready = await Content.countDocuments({ source: 'fish_api', status: 'ready', usedFor: null });
   const needed = Math.min(options.maxPerRun, options.targetPoolSize - ready);
   if (needed <= 0) return { added: 0, message: `pool full (${ready} ready)` };
 

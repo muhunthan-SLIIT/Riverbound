@@ -4,7 +4,7 @@
 // so the player can skip it and still do everything. Start Playing / Skip save tutorialDone.
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FEED_BATCH_SIZE, FEED_BONUS_COINS, FISH_SALE_PRICE } from '@riverbound/shared';
+import { FEED_BONUS_COINS, FEED_MIN_UNFED, FISH_SALE_PRICE } from '@riverbound/shared';
 import { PageStatus } from '../components/PageStatus.tsx';
 import { SceneBackground } from '../components/SceneBackground.tsx';
 import { SpriteIcon, type IconName } from '../components/SpriteIcon.tsx';
@@ -14,14 +14,12 @@ import { paths } from '../routes/paths.ts';
 import '../styles/pages/tutorial.css';
 
 // Text uses the shared rule numbers, so the tutorial can never disagree with the real game.
-const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
-const batch = WORDS[FEED_BATCH_SIZE] ?? String(FEED_BATCH_SIZE);
 
 const STEPS: Array<{ icon: IconName; title: string; text: string }> = [
   { icon: 'fish', title: 'Catch fish', text: 'One direct action. Fish are recorded for you.' },
-  { icon: 'food_crate', title: `Prepare ${batch} fish`, text: `Reserve exactly ${batch} unfed fish. Food is free.` },
+  { icon: 'food_crate', title: 'Prepare a batch', text: `With ${FEED_MIN_UNFED} unfed fish, a river picture picks how many you feed. Food is free.` },
   { icon: 'food_crate', title: 'Solve feeding maths', text: `Correct maths feeds the batch and earns +${FEED_BONUS_COINS} once.` },
-  { icon: 'coin', title: 'Sell fed fish', text: `Only fed fish sell: ${batch} fish earn ${FEED_BATCH_SIZE * FISH_SALE_PRICE} coins.` },
+  { icon: 'coin', title: 'Sell fed fish', text: `Only fed fish sell, at ${FISH_SALE_PRICE} coins each.` },
   { icon: 'river_map', title: 'Map, then compass', text: 'Your first tools unlock the river journey.' },
   { icon: 'compass', title: 'Find your crew', text: 'Equip tools, cross safely, rescue your teammates.' },
 ];

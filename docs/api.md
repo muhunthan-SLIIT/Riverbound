@@ -39,10 +39,10 @@ Errors look like: `{ "error": { "code": "NOT_ENOUGH_COINS", "message": "You need
 | GET `/campaigns/:id/shop` | Yes | Items with Buy / Owned / Locked / Need coins | Built |
 | POST `/campaigns/:id/buy` | Yes | Buy `{itemId}` | Built |
 | POST `/campaigns/:id/camp/rest` | Yes | Free rest to 3 hearts | Built |
-| POST `/campaigns/:id/feeding/start` | Yes | Reserve 4 fish, get a maths question | Built |
+| POST `/campaigns/:id/feeding/start` | Yes | Needs 12+ unfed fish. Claims a Fish API puzzle, reserves its fish count (1-12), returns a maths question with `imageUrl` (v2.5). 409 `NOT_ENOUGH_FISH`, 503 `NO_PUZZLES` | Built |
 | GET `/campaigns/:id/feeding/active` | Yes | Resume an unfinished batch | Built |
-| POST `/feeding-batches/:batchId/retry` | Yes | New question after a wrong answer | Built |
-| POST `/feeding-batches/:batchId/cancel` | Yes | Give the 4 fish back | Built |
+| POST `/feeding-batches/:batchId/retry` | Yes | New question (new pellet numbers) for the same batch and picture after a wrong answer | Built |
+| POST `/feeding-batches/:batchId/cancel` | Yes | Give the batch's fish back | Built |
 | GET `/challenges/:challengeId` | Yes | Feeding question or crossing details. Crossing counts are included only after answering. | Built |
 | POST `/challenges/:challengeId/answer` | Yes | Feeding: `{value}` or `{quotient, remainder}`. Crossing: `{fish, chests}` (both together), or `{timeout: true}` (accepted only once the server's own deadline has passed) | Built |
 | GET `/challenges/:challengeId/image` | Yes | Crossing picture, served from MongoDB with `Cache-Control: private, no-store`. The provider's file name is never sent. | Built |

@@ -1,10 +1,14 @@
 // Core numbers of the Riverbound game rules (version 2.2).
 // The server is the only place that applies these rules; the client only displays them.
 
-export const RULES_VERSION = '2.4'; // 2.3: fishing tools removed; 2.4: each catch gives a random 1-4 fish
+export const RULES_VERSION = '2.5'; // 2.3: fishing tools removed; 2.4: random 1-4 catch; 2.5: feeding uses Fish API puzzles
 
 export const MAX_HEARTS = 3;
-export const FEED_BATCH_SIZE = 4;
+// Feeding (rules v2.5, 15 Nov 2026): you need at least 12 unfed fish to start feeding.
+// The batch size is the fish count of a Fish API puzzle (1-12), so the question always matches
+// the fish you really reserve. 12 is the most fish a feeding puzzle can have.
+export const FEED_MIN_UNFED = 12;
+export const FEED_PUZZLE_FISH_MAX = FEED_MIN_UNFED;
 export const FEED_BONUS_COINS = 5;
 export const FISH_SALE_PRICE = 10;
 export const CHEST_LOOT_COINS = 10;

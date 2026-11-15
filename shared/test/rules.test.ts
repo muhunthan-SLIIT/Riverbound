@@ -14,7 +14,7 @@ import {
   contentFitsRegion,
   correctAnswer,
   createRng,
-  generateQuestion,
+  generateQuestionFromPuzzle,
   getItemState,
   getRegion,
   isCorrect,
@@ -90,24 +90,45 @@ test('feeding: invalid parameter combinations are rejected', () => {
   assert.throws(() => makeQuestion('extra_crates', { fish: 4, crates: 6, perCrate: 12, needPerFish: 1 }));
 });
 
-test('feeding: 3000 generated questions are always valid and never divide by zero', () => {
+test('feeding (v2.5): questions built from every possible puzzle are valid whole-number questions', () => {
+  // Every fish count 1-12 and chest count 1-12 a Fish API puzzle can give, at every difficulty.
   const rng = createRng(42);
   const seen = new Set<string>();
   for (const difficulty of ['easy', 'medium', 'hard'] as const) {
-    for (let i = 0; i < 1000; i += 1) {
-      const q = generateQuestion(rng, difficulty);
-      seen.add(q.type);
-      assert.equal(q.params.fish, 4);
-      assert.ok(TYPES_BY_DIFFICULTY[difficulty].includes(q.type) || q.type === 'total_food');
-      const answer = correctAnswer(q);
-      if (answer.kind === 'number') {
-        assert.ok(Number.isInteger(answer.value) && answer.value >= 0, `${q.type} gave ${answer.value}`);
+    for (let fish = 1; fish <= 12; fish += 1) {
+      for (let chests = 1; chests <= 12; chests += 1) {
+        for (let k = 0; k < 6; k += 1) {
+          const q = generateQuestionFromPuzzle(rng, difficulty, fish, chests);
+          seen.add(q.type);
+          // The question uses the puzzle's own numbers: the fish you reserve and the chests in the picture.
+          assert.equal(q.params.fish, fish);
+          assert.equal(q.params.crates, chests);
+          assert.ok(q.params.perCrate >= 1 && q.params.perCrate <= 12);
+          assert.ok(TYPES_BY_DIFFICULTY[difficulty].includes(q.type) || q.type === 'total_food');
+          const answer = correctAnswer(q);
+          if (answer.kind === 'number') {
+            assert.ok(Number.isInteger(answer.value) && answer.value >= 0, `${q.type} gave ${answer.value}`);
+          }
+          if (q.type === 'extra_crates') assert.ok(answer.kind === 'number' && answer.value >= 1);
+          assert.equal(isCorrect(q, answer), true);
+          assert.match(q.text, /food chest/);
+        }
       }
-      if (q.type === 'extra_crates') assert.ok(answer.kind === 'number' && answer.value >= 1);
-      assert.equal(isCorrect(q, answer), true);
     }
   }
   for (const type of FEEDING_TYPES) assert.ok(seen.has(type), `never generated ${type}`);
+  assert.throws(() => generateQuestionFromPuzzle(rng, 'easy', 0, 3));
+});
+
+test('feeding (v2.5): your example, 7 fish and 3 chests, equal share is always a whole number', () => {
+  const rng = createRng(7);
+  for (let i = 0; i < 200; i += 1) {
+    const q = generateQuestionFromPuzzle(rng, 'easy', 7, 3);
+    if (q.type !== 'equal_share') continue;
+    // 3 chests x P pellets must divide by 7 fish, so P must be 7 (the only multiple of 7 up to 12).
+    assert.equal(q.params.perCrate, 7);
+    assert.deepEqual(correctAnswer(q), { kind: 'number', value: 3 });
+  }
 });
 
 test('feeding: answer parsing rejects bad input', () => {
@@ -175,8 +196,9 @@ test('objective follows the purchase order and the player stock', async () => {
   const base = { coins: 0, ownedItems: [] as never[], regionsCleared: [] as string[], unfedAvailable: 0, unfedReserved: 0, fedAvailable: 0, hearts: 3 };
   const start = currentObjective(base);
   assert.equal(start.title, 'Buy your river map');
-  assert.deepEqual(start.lines, ['Catch, feed, and sell four fish.', 'Your first map costs 30 coins.']);
-  assert.match(currentObjective({ ...base, unfedAvailable: 4 }).lines[0], /Feed 4 fish/);
+  assert.deepEqual(start.lines, ['Catch at least 12 fish, then feed and sell them.', 'Your first map costs 30 coins.']);
+  assert.match(currentObjective({ ...base, unfedAvailable: 12 }).lines[0], /start a feeding batch/);
+  assert.doesNotMatch(currentObjective({ ...base, unfedAvailable: 11 }).lines[0], /start a feeding batch/);
   assert.match(currentObjective({ ...base, fedAvailable: 4 }).lines[0], /Sell your fed fish/);
   assert.equal(currentObjective({ ...base, coins: 30 }).lines[0], 'You have enough coins.');
   assert.equal(currentObjective({ ...base, ownedItems: ['river_map'] as never[] }).title, 'Buy your compass');

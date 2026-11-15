@@ -2,12 +2,15 @@
 // Usage: start the API (npm run dev:server), then run: npm run smoke
 // It creates a throwaway account, so use your development database, not production.
 //
-// The crossing part needs puzzles in the database: run the worker once first (npm run dev:worker).
+// Feeding (rules v2.5) and crossings both need puzzles in the database: run the worker once first (npm run dev:worker).
 // To answer crossings correctly, this TEST script looks up the secret counts directly in MongoDB.
 // The real browser can never do that: it only talks to the API, which hides the counts.
 import { randomUUID } from 'node:crypto';
 import assert from 'node:assert/strict';
 import {
+  FEED_BONUS_COINS,
+  FEED_MIN_UNFED,
+  FISH_SALE_PRICE,
   correctAnswer,
   type CampaignDTO,
   type CrossingAnswerResult,
@@ -60,17 +63,38 @@ async function catchUntil(campaignId: string, n: number): Promise<CampaignDTO> {
   return campaign;
 }
 
-async function feedOneBatch(campaignId: string): Promise<CampaignDTO> {
-  await catchUntil(campaignId, 4);
+/**
+ * One full earning cycle (rules v2.5): catch up to 12, start feeding, answer correctly, sell the fed fish.
+ * The batch size comes from the Fish API puzzle, so the coins earned are 5 + 10 x (fish in the picture).
+ */
+async function feedOneBatch(campaignId: string): Promise<{ campaign: CampaignDTO; fish: number; earned: number }> {
+  const before = await catchUntil(campaignId, FEED_MIN_UNFED);
   const started = await call('POST', `/campaigns/${campaignId}/feeding/start`);
   assert.equal(started.status, 201, JSON.stringify(started.data));
   const challenge = started.data.challenge as FeedingChallengeDTO;
+  const fish = challenge.question.params.fish;
+  await checkFeedingPuzzle(challenge, before.inventory.unfedAvailable);
   const answer = correctAnswer({ ...challenge.question });
   const answered = await call('POST', `/challenges/${challenge.id}/answer`, answer as unknown as Json);
   assert.equal(answered.data.result, 'correct', JSON.stringify(answered.data));
-  const sold = await call('POST', `/campaigns/${campaignId}/fish/sell`, { quantity: 4 });
+  const sold = await call('POST', `/campaigns/${campaignId}/fish/sell`, { quantity: fish });
   assert.equal(sold.status, 200, JSON.stringify(sold.data));
-  return sold.data.campaign as CampaignDTO;
+  const campaign = sold.data.campaign as CampaignDTO;
+  return { campaign, fish, earned: FEED_BONUS_COINS + fish * FISH_SALE_PRICE };
+}
+
+/** TEST ONLY: the feeding question really uses the Fish API puzzle's numbers, and the puzzle is claimed for feeding. */
+async function checkFeedingPuzzle(challenge: FeedingChallengeDTO, unfedBefore: number) {
+  const ch = await Challenge.findById(challenge.id).lean();
+  const content = ch?.content ? await Content.findById(ch.content).lean() : null;
+  assert.ok(content, 'feeding challenge must point at a puzzle');
+  assert.equal(content.usedFor, 'feeding');
+  assert.equal(challenge.question.params.fish, content.fishCount, 'batch size = fish in the picture');
+  assert.equal(challenge.question.params.crates, content.chestCount, 'food chests = chests in the picture');
+  assert.ok(content.fishCount >= 1 && content.fishCount <= 12 && unfedBefore >= FEED_MIN_UNFED);
+  assert.ok(challenge.imageUrl, 'feeding question shows the picture');
+  const img = await call('GET', `/challenges/${challenge.id}/image`);
+  assert.equal(img.status, 200);
 }
 
 /** TEST ONLY: reads the hidden counts of a crossing straight from the database. */
@@ -78,6 +102,8 @@ async function secretCounts(challengeId: string): Promise<{ fish: number; chests
   const ch = await Challenge.findById(challengeId).lean();
   const content = ch ? await Content.findById(ch.content).lean() : null;
   if (!content) throw new Error('crossing content not found');
+  // v2.5: a crossing never uses a picture that was shown in a feeding question.
+  assert.equal(content.usedFor, 'crossing');
   return { fish: content.fishCount, chests: content.chestCount };
 }
 
@@ -97,8 +123,7 @@ async function crossingTests(id: string, startCampaign: CampaignDTO) {
   let campaign = startCampaign;
 
   step('earn and buy goggles + outfit (Shallow Bend kit)');
-  campaign = await feedOneBatch(id);
-  campaign = await feedOneBatch(id);
+  while (campaign.coins < 70) campaign = (await feedOneBatch(id)).campaign;
   for (const itemId of ['swimming_goggles', 'swimming_outfit']) {
     const bought = await call('POST', `/campaigns/${id}/buy`, { itemId });
     assert.equal(bought.status, 200, JSON.stringify(bought.data));
@@ -249,9 +274,13 @@ async function main() {
   campaign = (await call('GET', `/campaigns/${id}`)).data.campaign as CampaignDTO;
   assert.equal(campaign.inventory.unfedAvailable, first.caught);
 
-  if (campaign.inventory.unfedAvailable < 4) {
-    step('feeding with too few fish is refused (V2-03)');
-    assert.equal((await call('POST', `/campaigns/${id}/feeding/start`)).status, 409);
+  step('feeding with fewer than 12 fish is refused (v2.5, V2-03)');
+  await catchUntil(id, 1);
+  campaign = (await call('GET', `/campaigns/${id}`)).data.campaign as CampaignDTO;
+  if (campaign.inventory.unfedAvailable < FEED_MIN_UNFED) {
+    const refused = await call('POST', `/campaigns/${id}/feeding/start`);
+    assert.equal(refused.status, 409);
+    assert.equal((refused.data.error as { code: string }).code, 'NOT_ENOUGH_FISH');
   }
 
   step('selling unfed fish is refused (V2-08)');
@@ -260,43 +289,56 @@ async function main() {
   step('buying the compass before the map is refused');
   assert.equal((await call('POST', `/campaigns/${id}/buy`, { itemId: 'compass' })).status, 409);
 
-  step('cycle 1: catch, feed, sell -> 45 coins (V2-09)');
-  campaign = await feedOneBatch(id);
-  assert.equal(campaign.coins, 45);
+  step('cycle 1: catch 12, feed the picture\'s fish, sell -> 5 + 10 x fish coins (V2-09)');
+  let cycle = await feedOneBatch(id);
+  assert.equal(cycle.campaign.coins, cycle.earned);
+  campaign = cycle.campaign;
+  while (campaign.coins < 30) {
+    const coinsBefore = campaign.coins;
+    cycle = await feedOneBatch(id);
+    assert.equal(cycle.campaign.coins, coinsBefore + cycle.earned);
+    campaign = cycle.campaign;
+  }
 
-  step('buy the map -> 15 coins left (V2-10)');
+  step('buy the map (V2-10)');
+  const coinsBeforeMap = campaign.coins;
   campaign = (await call('POST', `/campaigns/${id}/buy`, { itemId: 'river_map' })).data.campaign as CampaignDTO;
-  assert.equal(campaign.coins, 15);
+  assert.equal(campaign.coins, coinsBeforeMap - 30);
 
   step('wrong feeding answer keeps the fish reserved, no penalty (V2-06)');
-  await catchUntil(id, 4);
+  await catchUntil(id, FEED_MIN_UNFED);
   const started = await call('POST', `/campaigns/${id}/feeding/start`);
   const challenge = started.data.challenge as FeedingChallengeDTO;
+  const batchFish = challenge.question.params.fish;
   const wrongBody = challenge.question.answerKind === 'boolean' ? { value: !(correctAnswer(challenge.question) as { value: boolean }).value } : challenge.question.answerKind === 'number' ? { value: 9999 } : { quotient: 9999, remainder: 0 };
   const wrong = await call('POST', `/challenges/${challenge.id}/answer`, wrongBody);
   assert.equal(wrong.data.result, 'wrong');
   assert.ok(Array.isArray(wrong.data.workedSolution));
   campaign = wrong.data.campaign as CampaignDTO;
-  assert.equal(campaign.inventory.unfedReserved, 4);
+  assert.equal(campaign.inventory.unfedReserved, batchFish);
   assert.equal(campaign.hearts, 3);
 
-  step('cancel releases the 4 fish once (V2-07)');
+  step('a new question for the same batch keeps the same picture and fish (v2.5)');
+  const retried = await call('POST', `/feeding-batches/${challenge.batchId}/retry`);
+  assert.equal(retried.status, 200, JSON.stringify(retried.data));
+  const retryChallenge = retried.data.challenge as FeedingChallengeDTO;
+  assert.notEqual(retryChallenge.id, challenge.id);
+  assert.equal(retryChallenge.question.params.fish, batchFish);
+  assert.equal(retryChallenge.question.params.crates, challenge.question.params.crates);
+
+  step('cancel releases the batch\'s fish once (V2-07)');
   const unfedBeforeCancel = campaign.inventory.unfedAvailable;
   const cancelled = await call('POST', `/feeding-batches/${challenge.batchId}/cancel`);
   campaign = cancelled.data.campaign as CampaignDTO;
   assert.equal(campaign.inventory.unfedReserved, 0);
-  assert.equal(campaign.inventory.unfedAvailable, unfedBeforeCancel + 4); // left-overs + the 4 released
+  assert.equal(campaign.inventory.unfedAvailable, unfedBeforeCancel + batchFish);
   assert.equal((await call('POST', `/feeding-batches/${challenge.batchId}/cancel`)).status, 409);
 
-  step('cycle 2 -> 60 coins, buy compass -> 20 left (V2-10)');
-  await catchUntil(id, 4);
-  const s2 = await call('POST', `/campaigns/${id}/feeding/start`);
-  const c2 = s2.data.challenge as FeedingChallengeDTO;
-  await call('POST', `/challenges/${c2.id}/answer`, correctAnswer(c2.question) as unknown as Json);
-  campaign = (await call('POST', `/campaigns/${id}/fish/sell`, { quantity: 4 })).data.campaign as CampaignDTO;
-  assert.equal(campaign.coins, 60);
+  step('earn and buy the compass (V2-10)');
+  while (campaign.coins < 40) campaign = (await feedOneBatch(id)).campaign;
+  const coinsBeforeCompass = campaign.coins;
   campaign = (await call('POST', `/campaigns/${id}/buy`, { itemId: 'compass' })).data.campaign as CampaignDTO;
-  assert.equal(campaign.coins, 20);
+  assert.equal(campaign.coins, coinsBeforeCompass - 40);
 
   step('fish conservation: caught = unfed + reserved + fed + sold');
   const inv = campaign.inventory;

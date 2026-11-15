@@ -1,7 +1,7 @@
 // Works out the "Current objective" shown at camp (App Spec page 9).
 // Purchase priority: map -> compass -> basic travel kit -> gear for the next region
 // -> rescue the next teammate -> boat -> escape.
-import { FEED_BATCH_SIZE, FISH_SALE_PRICE } from './constants.ts';
+import { FEED_MIN_UNFED, FISH_SALE_PRICE } from './constants.ts';
 import { COMPANIONS, REGIONS } from './regions.ts';
 import { getShopItem, type ItemId } from './shop.ts';
 
@@ -31,8 +31,8 @@ export function nextPurchase(owned: readonly ItemId[], regionsCleared: number): 
 export function earningHint(i: Pick<ObjectiveInput, 'unfedAvailable' | 'unfedReserved' | 'fedAvailable'>): string {
   if (i.unfedReserved > 0) return 'Finish your feeding batch at the fish pen.';
   if (i.fedAvailable > 0) return `Sell your fed fish to the merchant (${FISH_SALE_PRICE} coins each).`;
-  if (i.unfedAvailable >= FEED_BATCH_SIZE) return `Feed ${FEED_BATCH_SIZE} fish at the fish pen.`;
-  return 'Catch, feed, and sell four fish.';
+  if (i.unfedAvailable >= FEED_MIN_UNFED) return 'Your fish are ready: start a feeding batch at the fish pen.';
+  return `Catch at least ${FEED_MIN_UNFED} fish, then feed and sell them.`;
 }
 
 export function currentObjective(i: ObjectiveInput): Objective {

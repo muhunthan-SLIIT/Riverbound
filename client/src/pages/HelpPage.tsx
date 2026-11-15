@@ -3,7 +3,7 @@
 // always matches what the server actually does.
 import {
   CHEST_LOOT_COINS,
-  FEED_BATCH_SIZE,
+  FEED_MIN_UNFED,
   FEED_BONUS_COINS,
   FISH_SALE_PRICE,
   MAX_HEARTS,
@@ -24,7 +24,7 @@ const SECTIONS: { title: string; lines: string[] }[] = [
     title: 'Catch & prepare',
     lines: [
       'Catch with your free hand net: a random 1 to 4 fish per catch.',
-      `Reserve exactly ${FEED_BATCH_SIZE} unfed fish. Food is free.`,
+      `You need at least ${FEED_MIN_UNFED} unfed fish. A river picture (from the Fish API) decides how many you feed: its fish are your batch and its chests are food chests. Food is free.`,
       'Unfed / Reserved / Fed remain separate.',
     ],
   },
@@ -32,7 +32,7 @@ const SECTIONS: { title: string; lines: string[] }[] = [
     title: 'Feed & trade',
     lines: [
       'Solve whole-number maths; wrong answers cost no hearts.',
-      `Correct: ${FEED_BATCH_SIZE} fed fish +${FEED_BONUS_COINS} coins, once per batch.`,
+      `Correct: every fish in the batch becomes fed, +${FEED_BONUS_COINS} coins, once per batch.`,
       `Only fed fish sell: ${FISH_SALE_PRICE} coins each.`,
     ],
   },

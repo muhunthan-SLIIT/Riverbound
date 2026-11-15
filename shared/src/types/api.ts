@@ -119,6 +119,7 @@ export type FeedingChallengeDTO = {
   type: 'feeding';
   batchId: string;
   question: { type: FeedingType; text: string; answerKind: AnswerKind; params: FeedingParams };
+  imageUrl: string | null; // v2.5: the Fish API picture (fish + food chests); null for old batches
   status: 'open' | 'correct' | 'wrong' | 'cancelled';
   workedSolution: string[] | null; // only after a wrong answer
 };

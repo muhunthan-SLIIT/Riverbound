@@ -1,14 +1,15 @@
 // Page 12: Feeding Maths Challenge (Figma node 18:534). No camp navigation: the player stays focused.
 // - Loads the open question for the active batch (GET /api/campaigns/:id/feeding/active).
 // - Sends ONE answer (POST /api/challenges/:id/answer). The server checks it and gives the reward:
-//     correct -> 4 fish become fed, +5 coins once, reward chest shown
+//     correct -> the batch's fish become fed, +5 coins once, reward chest shown
 //     wrong   -> worked solution, nothing lost, fish stay reserved, "Try a new question"
-// - "Exit feeding" asks first, then gives the 4 fish back (POST /api/feeding-batches/:id/cancel).
+// - "Exit feeding" asks first, then gives the fish back (POST /api/feeding-batches/:id/cancel).
+// Rules v2.5: the question is built from a Fish API picture. The picture is shown here (served by
+// our server, never the provider's file name). Its fish are your batch; its chests are food chests.
 // Untimed by design: this is a learning activity.
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
-  FEED_BATCH_SIZE,
   feedingDifficultyFor,
   type CampaignDTO,
   type FeedingAnswer,
@@ -27,12 +28,12 @@ import '../styles/pages/feeding.css';
 
 /** Wording for each question type. The numbers themselves always come from the server's question. */
 const COPY: Record<FeedingType, { tag: string; title: string; label: string; hint: string }> = {
-  total_food: { tag: 'Total food', title: 'Count every pellet.', label: 'Total pellets', hint: 'Multiply crates by pellets in each crate.' },
+  total_food: { tag: 'Total food', title: 'Count every pellet.', label: 'Total pellets', hint: 'Multiply chests by pellets in each chest.' },
   equal_share: { tag: 'Fair share', title: 'A fair share for every fish.', label: 'Pellets per fish', hint: 'No decimals or fractions needed.' },
   enough_food: { tag: 'Enough food?', title: 'Is there enough for everyone?', label: 'Is there enough food?', hint: 'Compare the pellets you have with the pellets you need.' },
   leftover: { tag: 'Leftovers', title: 'What is left after dinner?', label: 'Pellets left over', hint: 'Work out what the fish eat, then subtract.' },
   share_remainder: { tag: 'Share and remainder', title: 'Share fairly. Count what is left.', label: 'Pellets per fish', hint: 'Whole pellets only. Give the share and the remainder.' },
-  extra_crates: { tag: 'Extra crates', title: 'How many more crates?', label: 'Extra crates needed', hint: 'A part-crate still means one more crate.' },
+  extra_crates: { tag: 'Extra chests', title: 'How many more chests?', label: 'Extra chests needed', hint: 'A part-chest still means one more chest.' },
 };
 
 type Load =
@@ -171,20 +172,33 @@ function FeedingContent({ campaign: c, setCampaign }: { campaign: CampaignDTO; s
         <p className="eyebrow feed__eyebrow">
           Feeding maths · {difficulty} · {copy.tag}
         </p>
-        <h1 className="feed__title">{correct ? 'Four happy fish!' : copy.title}</h1>
+        <h1 className="feed__title">{correct ? `${q.params.fish} happy fish!` : copy.title}</h1>
 
         <section className="feed__card" aria-labelledby="batch-label">
           <div className="feed__batch">
             <p id="batch-label" className="feed__batch-label">
-              Your reserved batch · exactly four fish
+              Your reserved batch · {q.params.fish} fish · {q.params.crates} food chest{q.params.crates === 1 ? '' : 's'}
             </p>
-            <ul className={`feed__fish${correct ? ' feed__fish--happy' : ''}`} aria-label={`${FEED_BATCH_SIZE} fish`}>
-              {Array.from({ length: q.params.fish }, (_, i) => (
-                <li key={i}>
-                  <SpriteIcon name="fish" size={112} />
-                </li>
-              ))}
-            </ul>
+            {load.challenge.imageUrl ? (
+              <figure className={`feed__picture${correct ? ' feed__picture--happy' : ''}`}>
+                {/* The counts are already in the question, so the alt text may say them. */}
+                <img
+                  src={load.challenge.imageUrl}
+                  alt={`River picture with ${q.params.fish} fish and ${q.params.crates} food chest${q.params.crates === 1 ? '' : 's'}.`}
+                  width={660}
+                  height={360}
+                />
+                <figcaption>The fish in this picture are your batch. Each chest holds food pellets.</figcaption>
+              </figure>
+            ) : (
+              <ul className={`feed__fish${correct ? ' feed__fish--happy' : ''}`} aria-label={`${q.params.fish} fish`}>
+                {Array.from({ length: q.params.fish }, (_, i) => (
+                  <li key={i}>
+                    <SpriteIcon name="fish" size={q.params.fish > 4 ? 64 : 112} />
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <div className="feed__supply">
@@ -193,9 +207,9 @@ function FeedingContent({ campaign: c, setCampaign }: { campaign: CampaignDTO; s
             </span>
             <div>
               <p className="feed__supply-title">
-                {q.params.crates} food crate{q.params.crates === 1 ? '' : 's'}
+                {q.params.crates} food chest{q.params.crates === 1 ? '' : 's'}
               </p>
-              <p className="feed__supply-text">{q.params.perCrate} pellets in each crate</p>
+              <p className="feed__supply-text">{q.params.perCrate} pellets in each chest</p>
               {(q.type === 'enough_food' || q.type === 'leftover' || q.type === 'extra_crates') && (
                 <p className="feed__supply-text">Each fish needs {q.params.needPerFish}</p>
               )}
@@ -372,7 +386,7 @@ function RewardPanel({ result, campaignId }: { result: FeedingAnswerResponse; ca
       <div>
         <p className="feed__result-title">Correct! The fish are fed.</p>
         <p className="feed__coins">+{result.coinsAwarded} coins</p>
-        <p className="feed__result-text">{FEED_BATCH_SIZE} fish ready to sell at 10 coins each.</p>
+        <p className="feed__result-text">{result.challenge.question.params.fish} fish ready to sell at 10 coins each.</p>
         <div className="feed__result-actions">
           <Link to={paths.inventory(campaignId)} className="btn btn-primary">
             Sell fed fish
@@ -397,7 +411,7 @@ function WrongPanel({ result, onRetry, retrying }: { result: FeedingAnswerRespon
         ))}
       </ol>
       <p className="feed__result-text">
-        The answer was <strong>{answerText(result.correctAnswer)}</strong>. No hearts or coins lost. Your four fish are still reserved.
+        The answer was <strong>{answerText(result.correctAnswer)}</strong>. No hearts or coins lost. Your fish are still reserved.
       </p>
       <button type="button" className="btn btn-primary" onClick={onRetry} disabled={retrying} aria-busy={retrying}>
         {retrying ? 'Preparing…' : 'Try a new question'}

@@ -24,3 +24,15 @@ export function pick<T>(rng: Rng, items: readonly T[]): T {
   if (item === undefined) throw new Error('Cannot pick from an empty list');
   return item;
 }
+
+/** A shuffled copy (Fisher-Yates). The original list is not changed. */
+export function shuffle<T>(rng: Rng, items: readonly T[]): T[] {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rng() * (i + 1));
+    const a = copy[i] as T;
+    copy[i] = copy[j] as T;
+    copy[j] = a;
+  }
+  return copy;
+}

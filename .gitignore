@@ -13,3 +13,6 @@ coverage/
 .DS_Store
 .vscode/*
 !.vscode/extensions.json
+
+# local AI assistant notes
+CLAUDE.md

@@ -23,7 +23,7 @@ const SECTIONS: { title: string; lines: string[] }[] = [
   {
     title: 'Catch & prepare',
     lines: [
-      'Catch directly with bare hands: 1 fish per catch.',
+      'Catch with your free hand net: 1 fish per catch.',
       `Reserve exactly ${FEED_BATCH_SIZE} unfed fish. Food is free.`,
       'Unfed / Reserved / Fed remain separate.',
     ],

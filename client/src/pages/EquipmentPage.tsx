@@ -44,7 +44,7 @@ function EquipmentContent({ campaign: c }: { campaign: CampaignDTO }) {
               {ownedSummary}
               <br />
               {owned.length === 0
-                ? 'Fishing: bare hands'
+                ? 'Fishing: free hand net'
                 : nextRegion
                   ? `${nextRegion.name} kit: ${missing.length ? 'not ready' : 'ready'}`
                   : 'All regions cleared'}
@@ -57,10 +57,10 @@ function EquipmentContent({ campaign: c }: { campaign: CampaignDTO }) {
               Fishing
             </h2>
             <p className="rack__method">
-              <span>Bare hands — {CATCH_YIELD} fish per catch</span>
+              <span>Hand net — {CATCH_YIELD} fish per catch</span>
               <span className="rack__method-state">Always available</span>
             </p>
-            <p className="rack__text">Fishing is always free. Each accepted catch adds {CATCH_YIELD} unfed fish to your stock.</p>
+            <p className="rack__text">The hand net is free and never runs out. Each accepted catch adds {CATCH_YIELD} unfed fish to your stock.</p>
             <Link to={paths.fishing(c.id)} className="btn btn-link rack__link">
               Go fishing
             </Link>

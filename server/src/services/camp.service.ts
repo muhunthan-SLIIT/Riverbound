@@ -1,13 +1,14 @@
 // Camp actions: catch fish, sell fed fish, buy items, rest.
 // Every action checks the rules on the server and saves the result atomically.
+import { randomInt as cryptoRandomInt } from 'node:crypto';
 import type { Types } from 'mongoose';
 import {
-  CATCH_YIELD,
   FISH_SALE_PRICE,
   MAX_HEARTS,
   getItemState,
   getShopItem,
   isItemId,
+  rollCatch,
   type CampaignDTO,
   type ShopItemDTO,
 } from '@riverbound/shared';
@@ -19,12 +20,20 @@ import { toCampaignDTO, toShopDTO } from './dto.ts';
 
 type Ids = { campaignId: Types.ObjectId; ownerId: Types.ObjectId; key: string };
 
-export async function catchFish({ campaignId, ownerId, key }: Ids): Promise<{ caught: number; campaign: CampaignDTO }> {
+/**
+ * One accepted Catch action: a random 1-4 unfed fish (rules v2.4).
+ * The SERVER rolls the number with crypto.randomInt; the request never chooses it.
+ * The result is saved with the action key, so retrying the same request returns the same number
+ * instead of rolling again. `randomInt` can be replaced in tests.
+ */
+export async function catchFish(
+  { campaignId, ownerId, key }: Ids,
+  randomInt: (min: number, maxExclusive: number) => number = cryptoRandomInt,
+): Promise<{ caught: number; campaign: CampaignDTO }> {
   return runAction({ ownerId, key, operation: 'fish.catch', payload: { campaignId: campaignId.toString() } }, async (session) => {
     const c = await loadOwnedCampaign(campaignId, ownerId, session);
     assertAtCampAndFree(c);
-    // The yield is a server rule (v2.3: bare hands only, 1 fish), never taken from the request.
-    const caught = CATCH_YIELD;
+    const caught = rollCatch(randomInt);
     c.inventory.unfedAvailable += caught;
     c.totals.fishCaught += caught;
     await c.save({ session });

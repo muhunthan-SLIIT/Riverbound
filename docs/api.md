@@ -34,7 +34,7 @@ Errors look like: `{ "error": { "code": "NOT_ENOUGH_COINS", "message": "You need
 | POST `/campaigns/:id/abandon` | Yes | Archive unfinished journey `{confirm: true}` | Built |
 | POST `/campaigns/:id/story` | Yes | Mark intro or tutorial seen `{step}` | Built |
 | GET `/leaderboard` | Yes | Top 20 **finished** journeys by score + your own row and rank (null if you have not finished). Public game data only: explorer name, character, score, perfect %, finish date. | Built |
-| POST `/campaigns/:id/fish/catch` | Yes | Catch fish: always 1 unfed fish (bare hands, v2.3) | Built |
+| POST `/campaigns/:id/fish/catch` | Yes | Catch fish: a random 1-4 unfed fish rolled by the server (v2.4). Returns `{ caught, campaign }`. A retry with the same Idempotency-Key returns the same number. | Built |
 | POST `/campaigns/:id/fish/sell` | Yes | Sell fed fish `{quantity}` | Built |
 | GET `/campaigns/:id/shop` | Yes | Items with Buy / Owned / Locked / Need coins | Built |
 | POST `/campaigns/:id/buy` | Yes | Buy `{itemId}` | Built |

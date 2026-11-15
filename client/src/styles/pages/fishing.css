@@ -287,11 +287,7 @@
 }
 
 /* The fish wriggles in the net. */
-.netcast__fish {
-  transform-box: fill-box;
-  transform-origin: center;
-}
-.netcast__fish > * {
+.netcast__fish-body {
   transform-box: fill-box;
   transform-origin: center;
   animation: fish-wriggle 260ms ease-in-out infinite alternate;

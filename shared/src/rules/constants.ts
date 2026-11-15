@@ -1,7 +1,7 @@
 // Core numbers of the Riverbound game rules (version 2.2).
 // The server is the only place that applies these rules; the client only displays them.
 
-export const RULES_VERSION = '2.3'; // 2.3: fishing tools removed, every catch gives 1 fish
+export const RULES_VERSION = '2.4'; // 2.3: fishing tools removed; 2.4: each catch gives a random 1-4 fish
 
 export const MAX_HEARTS = 3;
 export const FEED_BATCH_SIZE = 4;

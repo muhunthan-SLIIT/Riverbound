@@ -37,8 +37,31 @@ function step(name: string) {
   console.log(`• ${name}`);
 }
 
+/** Every fish the server says it caught, added up, to check conservation at the end. */
+let totalCaught = 0;
+
+/** One catch: the server rolls 1-4 fish (rules v2.4). */
+async function catchOnce(campaignId: string, key = randomUUID()): Promise<{ caught: number; campaign: CampaignDTO }> {
+  const res = await call('POST', `/campaigns/${campaignId}/fish/catch`, {}, key);
+  assert.equal(res.status, 200, JSON.stringify(res.data));
+  const caught = res.data.caught as number;
+  assert.ok(Number.isInteger(caught) && caught >= 1 && caught <= 4, `catch size ${caught} must be 1-4`);
+  return { caught, campaign: res.data.campaign as CampaignDTO };
+}
+
+/** Catches until there are at least `n` unfed fish. */
+async function catchUntil(campaignId: string, n: number): Promise<CampaignDTO> {
+  let campaign = (await call('GET', `/campaigns/${campaignId}`)).data.campaign as CampaignDTO;
+  while (campaign.inventory.unfedAvailable < n) {
+    const result = await catchOnce(campaignId);
+    totalCaught += result.caught;
+    campaign = result.campaign;
+  }
+  return campaign;
+}
+
 async function feedOneBatch(campaignId: string): Promise<CampaignDTO> {
-  for (let i = 0; i < 4; i += 1) assert.equal((await call('POST', `/campaigns/${campaignId}/fish/catch`)).status, 200);
+  await catchUntil(campaignId, 4);
   const started = await call('POST', `/campaigns/${campaignId}/feeding/start`);
   assert.equal(started.status, 201, JSON.stringify(started.data));
   const challenge = started.data.challenge as FeedingChallengeDTO;
@@ -217,16 +240,19 @@ async function main() {
   step('second unfinished campaign is refused (V2-25)');
   assert.equal((await call('POST', '/campaigns', { character: 'male' })).status, 409);
 
-  step('repeated catch with the same key pays once (V2-02)');
+  step('a catch gives 1-4 fish; repeating the same key gives the same result once (V2-02)');
   const key = randomUUID();
-  const first = await call('POST', `/campaigns/${id}/fish/catch`, {}, key);
-  const again = await call('POST', `/campaigns/${id}/fish/catch`, {}, key);
-  assert.deepEqual(again.data, first.data);
+  const first = await catchOnce(id, key);
+  const again = await catchOnce(id, key);
+  assert.equal(again.caught, first.caught, 'a retry must not roll again');
+  totalCaught += first.caught;
   campaign = (await call('GET', `/campaigns/${id}`)).data.campaign as CampaignDTO;
-  assert.equal(campaign.inventory.unfedAvailable, 1);
+  assert.equal(campaign.inventory.unfedAvailable, first.caught);
 
-  step('feeding with too few fish is refused (V2-03)');
-  assert.equal((await call('POST', `/campaigns/${id}/feeding/start`)).status, 409);
+  if (campaign.inventory.unfedAvailable < 4) {
+    step('feeding with too few fish is refused (V2-03)');
+    assert.equal((await call('POST', `/campaigns/${id}/feeding/start`)).status, 409);
+  }
 
   step('selling unfed fish is refused (V2-08)');
   assert.equal((await call('POST', `/campaigns/${id}/fish/sell`, { quantity: 1 })).status, 409);
@@ -243,7 +269,7 @@ async function main() {
   assert.equal(campaign.coins, 15);
 
   step('wrong feeding answer keeps the fish reserved, no penalty (V2-06)');
-  for (let i = 0; i < 4; i += 1) await call('POST', `/campaigns/${id}/fish/catch`);
+  await catchUntil(id, 4);
   const started = await call('POST', `/campaigns/${id}/feeding/start`);
   const challenge = started.data.challenge as FeedingChallengeDTO;
   const wrongBody = challenge.question.answerKind === 'boolean' ? { value: !(correctAnswer(challenge.question) as { value: boolean }).value } : challenge.question.answerKind === 'number' ? { value: 9999 } : { quotient: 9999, remainder: 0 };
@@ -255,14 +281,15 @@ async function main() {
   assert.equal(campaign.hearts, 3);
 
   step('cancel releases the 4 fish once (V2-07)');
+  const unfedBeforeCancel = campaign.inventory.unfedAvailable;
   const cancelled = await call('POST', `/feeding-batches/${challenge.batchId}/cancel`);
   campaign = cancelled.data.campaign as CampaignDTO;
   assert.equal(campaign.inventory.unfedReserved, 0);
-  assert.equal(campaign.inventory.unfedAvailable, 5); // 1 left over + 4 released
+  assert.equal(campaign.inventory.unfedAvailable, unfedBeforeCancel + 4); // left-overs + the 4 released
   assert.equal((await call('POST', `/feeding-batches/${challenge.batchId}/cancel`)).status, 409);
 
   step('cycle 2 -> 60 coins, buy compass -> 20 left (V2-10)');
-  // 5 unfed already: start feeding uses 4, leaving 1
+  await catchUntil(id, 4);
   const s2 = await call('POST', `/campaigns/${id}/feeding/start`);
   const c2 = s2.data.challenge as FeedingChallengeDTO;
   await call('POST', `/challenges/${c2.id}/answer`, correctAnswer(c2.question) as unknown as Json);
@@ -273,8 +300,8 @@ async function main() {
 
   step('fish conservation: caught = unfed + reserved + fed + sold');
   const inv = campaign.inventory;
-  // 1 (replay test) + 4 (cycle 1) + 4 (wrong-answer test) = 9 caught; cycle 2 reused fish already caught
-  assert.equal(campaign.totals.fishCaught, 9);
+  // Random catches (1-4 each): the server's total must equal what it told us, catch by catch.
+  assert.equal(campaign.totals.fishCaught, totalCaught);
   assert.equal(inv.unfedAvailable + inv.unfedReserved + inv.fedAvailable + campaign.totals.fishSold, campaign.totals.fishCaught);
 
   campaign = await crossingTests(id, campaign);

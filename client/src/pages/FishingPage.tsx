@@ -1,6 +1,6 @@
 // Page 10: Fishing Area / Direct Catch (Figma node 18:530).
 // "Catch Fish" sends ONE request to POST /api/campaigns/:id/fish/catch with an Idempotency-Key.
-// The server decides how many fish you get (hand net: 1 per catch). There is no quiz and no Fish API here.
+// The server decides how many fish you get (hand net: a random 1-4 per catch, rules v2.4). There is no quiz and no Fish API here.
 // If the connection drops, "Retry" re-sends the SAME key, so an uncertain catch can never count twice.
 //
 // Animation (15 Nov 2026): the explorer casts a hand net, waits for a bite and lifts it. The request is
@@ -8,7 +8,7 @@
 // and an empty net comes up if it failed. With reduced motion the catch is shown instantly instead.
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CATCH_YIELD, FEED_BATCH_SIZE, type CampaignDTO } from '@riverbound/shared';
+import { CATCH_MAX, CATCH_MIN, FEED_BATCH_SIZE, type CampaignDTO } from '@riverbound/shared';
 import { GameLayout } from '../components/game/GameLayout.tsx';
 import { NET_TIMING, NetCastAnimation, prefersReducedMotion, type NetPhase } from '../components/game/NetCastAnimation.tsx';
 import { SpriteIcon } from '../components/SpriteIcon.tsx';
@@ -33,6 +33,7 @@ function FishingContent({ campaign: c, setCampaign }: { campaign: CampaignDTO; s
   const [state, setState] = useState<CatchState>({ kind: 'idle' });
   const [phase, setPhase] = useState<NetPhase>('idle');
   const [run, setRun] = useState(0);
+  const [netCatch, setNetCatch] = useState(1); // how many fish to draw in the net (from the server)
   const actionKey = useRef(newActionKey());
   const catchCount = useRef(0);
   const timers = useRef<number[]>([]);
@@ -73,7 +74,8 @@ function FishingContent({ campaign: c, setCampaign }: { campaign: CampaignDTO; s
     if (outcome.ok) {
       actionKey.current = newActionKey(); // success: the next catch is a new action
       if (animate) {
-        setPhase('lift'); // the fish is in the net: the server has confirmed it
+        setNetCatch(outcome.result.caught);
+        setPhase('lift'); // the fish are in the net: the server has confirmed them
         await wait(NET_TIMING.lift);
         setPhase('caught');
       }
@@ -102,7 +104,7 @@ function FishingContent({ campaign: c, setCampaign }: { campaign: CampaignDTO; s
 
   return (
     <main className="fishing__main">
-      <NetCastAnimation phase={phase} run={run} />
+      <NetCastAnimation phase={phase} run={run} caught={netCatch} />
       <p className="eyebrow fishing__eyebrow">The dock</p>
       <h1 className="fishing__title">A little patience. A fresh start.</h1>
 
@@ -111,7 +113,7 @@ function FishingContent({ campaign: c, setCampaign }: { campaign: CampaignDTO; s
           Hand net
         </h2>
         <p className="fishing__loadout-text">
-          One accepted catch → {CATCH_YIELD} unfed fish
+          Each catch → {CATCH_MIN} to {CATCH_MAX} unfed fish (random)
         </p>
         <dl className="fishing__counts">
           <div>
@@ -206,6 +208,13 @@ function StatusText({
   if (phase === 'cast') return <p className="fishing__status-text">Casting the net…</p>;
   if (phase === 'wait') return <p className="fishing__status-text">Waiting for a bite…</p>;
   if (phase === 'lift') return <p className="fishing__status-text">Something is in the net!</p>;
+  if (phase === 'caught' && state.kind === 'caught') {
+    return (
+      <p className="fishing__status-text">
+        {state.caught === CATCH_MAX ? 'A full net! ' : ''}You caught {state.caught} fish!
+      </p>
+    );
+  }
   if (phase === 'missed') return <p className="fishing__status-text">The net came up empty…</p>;
   if (state.kind === 'pending') return <p className="fishing__status-text">Casting the net…</p>;
   if (state.kind === 'error') {

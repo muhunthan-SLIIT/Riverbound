@@ -15,9 +15,18 @@ export const NET_TIMING = { cast: 700, minDip: 600, lift: 650, caught: 900, miss
 const HANDS = { x: 925, y: 655 };
 const HOOP = { x: 760, y: 735 };
 
-export function NetCastAnimation({ phase, run }: { phase: NetPhase; run: number }) {
+// Where each fish sits in the net, and how big, for a catch of 1, 2, 3 or 4 (rules v2.4).
+const FISH_LAYOUT: Record<number, { scale: number; spots: [number, number][] }> = {
+  1: { scale: 1.15, spots: [[-2, 22]] },
+  2: { scale: 0.95, spots: [[-16, 14], [14, 32]] },
+  3: { scale: 0.85, spots: [[-20, 10], [18, 14], [-2, 38]] },
+  4: { scale: 0.8, spots: [[-22, 8], [20, 8], [-18, 36], [18, 38]] },
+};
+
+export function NetCastAnimation({ phase, run, caught = 1 }: { phase: NetPhase; run: number; caught?: number }) {
   if (phase === 'idle') return null;
   const showFish = phase === 'lift' || phase === 'caught';
+  const layout = FISH_LAYOUT[Math.min(4, Math.max(1, caught))] ?? FISH_LAYOUT[1]!;
 
   return (
     <svg
@@ -50,21 +59,25 @@ export function NetCastAnimation({ phase, run }: { phase: NetPhase; run: number 
 
       {/* The hand net: pole from the hands, an oval hoop and a mesh bag. It rotates around the hands. */}
       <g className="netcast__net">
-        <line className="netcast__pole" x1={HANDS.x} y1={HANDS.y} x2={HOOP.x + 28} y2={HOOP.y - 12} />
+        <line className="netcast__pole" x1={HANDS.x} y1={HANDS.y} x2={HOOP.x + 44} y2={HOOP.y - 14} />
         <path
           className="netcast__bag"
-          d={`M${HOOP.x - 34} ${HOOP.y} Q ${HOOP.x - 30} ${HOOP.y + 46} ${HOOP.x} ${HOOP.y + 50} Q ${HOOP.x + 30} ${HOOP.y + 46} ${HOOP.x + 34} ${HOOP.y} Z`}
+          d={`M${HOOP.x - 50} ${HOOP.y} Q ${HOOP.x - 46} ${HOOP.y + 62} ${HOOP.x} ${HOOP.y + 68} Q ${HOOP.x + 46} ${HOOP.y + 62} ${HOOP.x + 50} ${HOOP.y} Z`}
           fill="url(#net-mesh)"
         />
-        {showFish && (
-          <g className="netcast__fish" transform={`translate(${HOOP.x - 4} ${HOOP.y + 20})`}>
-            <path d="M-22 0 C -12 -11, 10 -11, 18 0 C 10 11, -12 11, -22 0 Z" fill="#7fb7c9" stroke="#2f5d6b" strokeWidth="2" />
-            <path d="M18 0 L 30 -9 L 28 0 L 30 9 Z" fill="#5f9bb0" stroke="#2f5d6b" strokeWidth="2" />
-            <circle cx="-13" cy="-2" r="2.4" fill="#102531" />
-            <path d="M-4 -6 C -1 -2, -1 2, -4 6" fill="none" stroke="#2f5d6b" strokeWidth="1.6" />
-          </g>
-        )}
-        <ellipse className="netcast__hoop" cx={HOOP.x} cy={HOOP.y} rx="35" ry="13" />
+        {showFish &&
+          layout.spots.map(([dx, dy], i) => (
+            <g key={i} className="netcast__fish" transform={`translate(${HOOP.x + dx} ${HOOP.y + dy}) scale(${layout.scale})`}>
+              {/* each fish wriggles slightly out of step with the others */}
+              <g className="netcast__fish-body" style={{ animationDelay: `${i * 70}ms` }}>
+                <path d="M-22 0 C -12 -11, 10 -11, 18 0 C 10 11, -12 11, -22 0 Z" fill="#7fb7c9" stroke="#2f5d6b" strokeWidth="2" />
+                <path d="M18 0 L 30 -9 L 28 0 L 30 9 Z" fill="#5f9bb0" stroke="#2f5d6b" strokeWidth="2" />
+                <circle cx="-13" cy="-2" r="2.4" fill="#102531" />
+                <path d="M-4 -6 C -1 -2, -1 2, -4 6" fill="none" stroke="#2f5d6b" strokeWidth="1.6" />
+              </g>
+            </g>
+          ))}
+        <ellipse className="netcast__hoop" cx={HOOP.x} cy={HOOP.y} rx="51" ry="17" />
       </g>
 
       {/* Water dripping from the lifted net */}
@@ -79,7 +92,7 @@ export function NetCastAnimation({ phase, run }: { phase: NetPhase; run: number 
       {/* "+1 fish" after a confirmed catch */}
       {phase === 'caught' && (
         <text className="netcast__plus" x={HOOP.x + 40} y={HOOP.y - 120}>
-          +1 fish
+          +{caught} fish
         </text>
       )}
     </svg>

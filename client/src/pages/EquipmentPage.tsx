@@ -3,7 +3,7 @@
 // v2.3: the fishing tools (rod, reel, hook, net, trap) were removed at the author's request,
 // so the Figma "One fishing method" choice is replaced by a short fishing panel. This page only reads.
 import { Link } from 'react-router-dom';
-import { CATCH_YIELD, REGIONS, getShopItem, missingGear, type CampaignDTO } from '@riverbound/shared';
+import { CATCH_MAX, CATCH_MIN, REGIONS, getShopItem, missingGear, type CampaignDTO } from '@riverbound/shared';
 import { GameLayout } from '../components/game/GameLayout.tsx';
 import { Portrait } from '../components/Portrait.tsx';
 import { SpriteIcon } from '../components/SpriteIcon.tsx';
@@ -57,10 +57,10 @@ function EquipmentContent({ campaign: c }: { campaign: CampaignDTO }) {
               Fishing
             </h2>
             <p className="rack__method">
-              <span>Hand net — {CATCH_YIELD} fish per catch</span>
+              <span>Hand net — {CATCH_MIN} to {CATCH_MAX} fish per catch</span>
               <span className="rack__method-state">Always available</span>
             </p>
-            <p className="rack__text">The hand net is free and never runs out. Each accepted catch adds {CATCH_YIELD} unfed fish to your stock.</p>
+            <p className="rack__text">The hand net is free and never runs out. Each catch adds a random {CATCH_MIN} to {CATCH_MAX} unfed fish to your stock.</p>
             <Link to={paths.fishing(c.id)} className="btn btn-link rack__link">
               Go fishing
             </Link>

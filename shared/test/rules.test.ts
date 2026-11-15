@@ -4,7 +4,10 @@ import assert from 'node:assert/strict';
 import {
   FEEDING_TYPES,
   TYPES_BY_DIFFICULTY,
-  CATCH_YIELD,
+  CATCH_MAX,
+  CATCH_MIN,
+  isValidCatch,
+  rollCatch,
   perfectRate,
   rankLeaderboard,
   SHOP_ITEMS,
@@ -50,13 +53,27 @@ test('economy example from the spec: two cycles buy map then compass', () => {
   assert.equal(coins, 20);
 });
 
-test('fishing: tools removed (v2.3), every catch gives 1 fish', () => {
-  assert.equal(CATCH_YIELD, 1);
+test('fishing: tools removed (v2.3); each catch is a random 1-4 fish (v2.4)', () => {
   const ids: string[] = SHOP_ITEMS.map((i) => i.id);
   for (const removed of ['rod_kit', 'improved_reel', 'hook_upgrade', 'net', 'specialized_trap']) {
     assert.equal(ids.includes(removed), false, `${removed} must not be sold`);
   }
   assert.equal(SHOP_ITEMS.length, 7);
+  assert.equal(CATCH_MIN, 1);
+  assert.equal(CATCH_MAX, 4);
+  // Every possible roll is allowed, and all four sizes can happen.
+  const rng = createRng(42);
+  const seen = new Set<number>();
+  for (let i = 0; i < 2000; i += 1) {
+    const n = rollCatch((min, max) => min + Math.floor(rng() * (max - min)));
+    assert.ok(isValidCatch(n));
+    seen.add(n);
+  }
+  assert.deepEqual([...seen].sort(), [1, 2, 3, 4]);
+  // A broken random function is caught instead of giving 0 or 5 fish.
+  assert.throws(() => rollCatch(() => 5));
+  assert.equal(isValidCatch(0), false);
+  assert.equal(isValidCatch(2.5), false);
 });
 
 test('feeding: spec example F=4, C=2, P=12 equal share is 6', () => {

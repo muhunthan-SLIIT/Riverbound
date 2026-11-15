@@ -23,6 +23,11 @@
   --color-silver: #c9d3d6; /* leaderboard rank 2 */
   --color-bronze: #d39a6a; /* leaderboard rank 3 */
   --color-forest: #0e4f47; /* highlighted dark card (fed stock, shop shelf) */
+  /* Google's own "light" sign-in button colours (Google branding rules, not our palette) */
+  --google-button-bg: #ffffff;
+  --google-button-hover: #f2f2f2;
+  --google-button-border: #747775;
+  --google-button-text: #1f1f1f;
   --scrim-ink: rgb(16 37 49 / 58%); /* dark layer over artwork so text stays readable */
 
   --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;

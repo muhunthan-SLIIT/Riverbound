@@ -107,6 +107,112 @@
   font-weight: 600;
 }
 
+/* ---------- Continue with Google / Apple (16 Nov 2026) ---------- */
+.auth__alert {
+  margin-top: var(--space-4);
+}
+
+.social {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.social__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 52px;
+  padding: 0 var(--space-5);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font: 600 17px/1.2 var(--font-body);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+.social__btn + .social__btn,
+.social__note + .social__btn {
+  margin-top: var(--space-2);
+}
+.social__btn:hover:not(:disabled) {
+  background: var(--color-cream-light);
+}
+.social__btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.social__btn:focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 3px;
+}
+.social__btn:disabled {
+  border-color: var(--color-reed);
+  background: var(--color-disabled-bg);
+  color: var(--color-disabled-text);
+  cursor: not-allowed;
+}
+
+.social__logo {
+  flex: none;
+}
+
+/* Google's "light" button theme (required for the colour G): white, grey border,
+   12px before the G and 10px between the G and the text. */
+.social__btn--google:not(:disabled) {
+  gap: 12px; /* Google: 10px at the standard 40px height; our button is 52px, so scaled up */
+  font-weight: 500;
+  border-color: var(--google-button-border);
+  background: var(--google-button-bg);
+  color: var(--google-button-text);
+}
+.social__btn--google:hover:not(:disabled) {
+  background: var(--google-button-hover);
+}
+
+.social__note {
+  margin: 0;
+  color: var(--color-mist);
+  font-size: 14px;
+  text-align: center;
+}
+
+.social__divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  color: var(--color-mist);
+  font-size: 15px;
+}
+.social__divider::before,
+.social__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-hud-border);
+}
+
+.auth__form--after-social {
+  margin-top: var(--space-3);
+}
+
+.auth__hint {
+  margin: var(--space-1) 0 0;
+  color: var(--color-mist);
+  font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .social__btn {
+    transition: none;
+  }
+}
+
 /* ---------- Tablet and mobile ---------- */
 @media (max-width: 1024px) {
   .auth {

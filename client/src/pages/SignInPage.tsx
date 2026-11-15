@@ -1,10 +1,14 @@
-// Page 04: Sign In (Figma node 18:518).
-// Signs in through POST /api/auth/login. A wrong email or password always shows the same
+// Page 04: Sign In (Figma node 18:518, re-ordered at the author's request on 16 Nov 2026):
+// Continue with Google, Continue with Apple, "or", then email and password.
+// Email sign-in uses POST /api/auth/login. A wrong email or password always shows the same
 // message, so nobody can find out which emails have accounts.
+// Google sign-in is a full-page trip through the server; on failure the server sends the player
+// back here with ?error=..., which is shown as a friendly message.
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { validateSignIn, type FieldErrors, type SignInInput } from '@riverbound/shared';
 import { AuthLayout } from '../components/AuthLayout.tsx';
+import { SocialSignIn, SOCIAL_ERRORS } from '../components/SocialSignIn.tsx';
 import { TextField } from '../components/TextField.tsx';
 import { useSession } from '../hooks/SessionContext.tsx';
 import { authApi } from '../services/gameApi.ts';
@@ -22,7 +26,10 @@ export function SignInPage() {
   const location = useLocation();
   const [values, setValues] = useState<SignInInput>({ email: '', password: '' });
   const [errors, setErrors] = useState<FieldErrors<SignInInput>>({});
-  const [formError, setFormError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(() => {
+    const code = new URLSearchParams(location.search).get('error');
+    return code ? (SOCIAL_ERRORS[code] ?? SOCIAL_ERRORS.google_failed ?? null) : null;
+  });
   const [pending, setPending] = useState(false);
 
   const returnTo = safeReturnPath(location.state);
@@ -64,12 +71,14 @@ export function SignInPage() {
       cardTitle="Sign In"
       cardIntro="Pick up your journey where you left it."
     >
-      <form className="auth__form" noValidate onSubmit={submit} aria-busy={pending}>
-        {formError && (
-          <p className="form-alert" role="alert">
-            {formError}
-          </p>
-        )}
+      {formError && (
+        <p className="form-alert auth__alert" role="alert">
+          {formError}
+        </p>
+      )}
+      <SocialSignIn />
+
+      <form className="auth__form auth__form--after-social" noValidate onSubmit={submit} aria-busy={pending}>
         <TextField
           label="Email address"
           name="email"
@@ -98,6 +107,7 @@ export function SignInPage() {
         <button type="submit" className="btn btn-primary auth__submit" disabled={pending}>
           {pending ? 'Signing in…' : 'Sign In'}
         </button>
+        <p className="auth__hint">Made your account with Google? Use Continue with Google above.</p>
       </form>
 
       <div className="auth__links">

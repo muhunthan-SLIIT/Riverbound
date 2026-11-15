@@ -26,6 +26,9 @@ Errors look like: `{ "error": { "code": "NOT_ENOUGH_COINS", "message": "You need
 | POST `/auth/login` | No | Sign in `{email, password}` | Built |
 | POST `/auth/logout` | No | Sign out (deletes the session) | Built |
 | GET `/auth/session` | Yes | Who am I | Built |
+| GET `/auth/providers` | No | Which sign-in buttons work: `{ google, apple }` | Built |
+| GET `/auth/google/start` | No | Full-page link: sets a 10-minute `rb_google` cookie (state + PKCE verifier) and redirects to Google | Built |
+| GET `/auth/google/callback` | No | Google returns here. Checks state, swaps the code, signs in or creates the account, sets the session cookie, redirects to `/campaigns` (new account: `/campaigns/new`). On a problem: redirects to `/login?error=google_cancelled \| google_expired \| google_failed \| google_email_taken \| google_off` | Built |
 | GET `/shop` | No | Shop catalogue | Built |
 | GET `/sounds` | No | Sound list from Freesound | Built |
 | GET `/campaigns` | Yes | My saved journeys | Built |

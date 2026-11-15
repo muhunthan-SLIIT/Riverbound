@@ -27,6 +27,9 @@ export function buildRoutes(env: Env): Router {
   router.post('/auth/login', authLimit, auth.login);
   router.post('/auth/logout', auth.logout);
   router.get('/auth/session', requireAuth, auth.session);
+  router.get('/auth/providers', auth.providers);
+  router.get('/auth/google/start', authLimit, auth.googleStart);
+  router.get('/auth/google/callback', authLimit, auth.googleCallback);
 
   // Public data
   router.get('/shop', g.shopCatalogue);

@@ -27,7 +27,12 @@ export const authApi = {
   login: (body: { email: string; password: string }) => api.post<{ user: UserDTO }>('/auth/login', body),
   logout: () => api.post<{ ok: true }>('/auth/logout'),
   session: (signal?: AbortSignal) => api.get<{ user: UserDTO }>('/auth/session', signal),
+  /** Which sign-in buttons work on this server (Google needs keys in server/.env). */
+  providers: (signal?: AbortSignal) => api.get<{ google: boolean; apple: boolean }>('/auth/providers', signal),
 };
+
+/** Full-page address that starts Google sign-in. It is a normal link, not a fetch: the browser must visit Google. */
+export const GOOGLE_SIGN_IN_URL = '/api/auth/google/start';
 
 export const campaignApi = {
   list: () => api.get<{ campaigns: CampaignDTO[] }>('/campaigns'),

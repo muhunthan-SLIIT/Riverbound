@@ -20,6 +20,7 @@ import {
 } from '@riverbound/shared';
 import { ConfirmDialog } from '../components/ConfirmDialog.tsx';
 import { GameLayout } from '../components/game/GameLayout.tsx';
+import { WeatherBadge, WeatherEffects } from '../components/game/RiverWeather.tsx';
 import { useSound } from '../hooks/SoundContext.tsx';
 import { ApiError, newActionKey } from '../services/apiClient.ts';
 import { crossingApi } from '../services/gameApi.ts';
@@ -185,11 +186,14 @@ function CrossingContent({ campaign: c, setCampaign }: { campaign: CampaignDTO; 
 
   return (
     <main className="cross__main">
+      {/* Rain / storm behind the panels (looks only; the timer change is decided by the server). */}
+      <WeatherEffects weather={c.expedition?.weather} />
       <header className="cross__head">
         <p className="eyebrow cross__eyebrow">
           {region.name} · Crossing {challenge.encounterIndex + 1} of {challenge.encounters}
         </p>
         <h1 className="cross__title">{headline(open, result)}</h1>
+        <WeatherBadge weather={c.expedition?.weather} />
       </header>
 
       <PictureCard key={challenge.id} challenge={challenge} setCampaign={setCampaign} onReplaced={(id) => navigate(paths.crossing(c.id, id), { replace: true })} />

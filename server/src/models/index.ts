@@ -8,3 +8,4 @@ export { ActionLog, type IActionLog } from './ActionLog.ts';
 export { Content, type IContent, type ContentDoc } from './Content.ts';
 export { Sound, type ISound } from './Sound.ts';
 export { WorkerRun, Lease, type IWorkerRun, type ILease } from './WorkerRun.ts';
+export { Weather, type IWeather } from './Weather.ts';

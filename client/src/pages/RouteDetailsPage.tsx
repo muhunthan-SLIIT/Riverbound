@@ -3,6 +3,8 @@
 // "Start Expedition" asks the server to start (POST /api/campaigns/:id/route/start). The server checks
 // the route order and the gear again, starts the player fully rested, and returns the first picture.
 // Timed or untimed is chosen here, before leaving; it cannot be changed mid-trip.
+// River weather: shown before leaving (what the trip would get now). Rain or storm takes 5 s off each
+// timed crossing. The server fixes the weather when the trip starts; during a trip the saved weather shows.
 import { useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
@@ -18,6 +20,8 @@ import {
 } from '@riverbound/shared';
 import { scenes } from '../assets/art.ts';
 import { GameLayout } from '../components/game/GameLayout.tsx';
+import { WeatherCard } from '../components/game/RiverWeather.tsx';
+import { useRegionWeather } from '../hooks/useRegionWeather.ts';
 import { useSound } from '../hooks/SoundContext.tsx';
 import { ApiError, newActionKey } from '../services/apiClient.ts';
 import { crossingApi } from '../services/gameApi.ts';
@@ -93,9 +97,13 @@ function RouteDetails({ campaign: c, setCampaign, regionId }: { campaign: Campai
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const actionKey = useRef(newActionKey());
+  const forecast = useRegionWeather();
 
   const onThisTrip = c.state === 'crossing' && c.expedition?.regionId === regionId;
   const encounterWord = NUMBER_WORDS[region.encounters] ?? String(region.encounters);
+  // On a trip: the weather saved when it started. Before: what a trip would get now.
+  const weather = onThisTrip ? (c.expedition?.weather ?? undefined) : forecast?.[regionId];
+  const timerSeconds = Math.max(10, region.timerSeconds - (weather?.timerPenaltySeconds ?? 0));
 
   /** Why the Start button is disabled (null = ready to go). */
   let blocker: string | null = null;
@@ -142,6 +150,7 @@ function RouteDetails({ campaign: c, setCampaign, regionId }: { campaign: Campai
             {story.goal}
           </h2>
           <p className="route__text">{story.text(encounterWord)}</p>
+          {status !== 'cleared' && <WeatherCard weather={weather} timed={onThisTrip ? c.expedition?.timed : timed} />}
         </section>
       </div>
 
@@ -190,7 +199,7 @@ function RouteDetails({ campaign: c, setCampaign, regionId }: { campaign: Campai
             </label>
             <label className={`route__mode-option${timed ? ' route__mode-option--on' : ''}`}>
               <input type="radio" name="mode" checked={timed} onChange={() => setTimed(true)} />
-              Timed · {region.timerSeconds}s each
+              Timed · {timerSeconds}s each
             </label>
             </div>
           </fieldset>

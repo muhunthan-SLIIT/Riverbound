@@ -12,6 +12,7 @@ import type {
   ItemId,
   RegionId,
   ShopItem,
+  WeatherListDTO,
   ShopItemDTO,
   SoundDTO,
   UserDTO,
@@ -92,4 +93,9 @@ export const leaderboardApi = {
 
 export const soundApi = {
   list: () => api.get<{ sounds: SoundDTO[] }>('/sounds'),
+};
+
+/** River weather (Open-Meteo via the worker): what each region would use if a trip started now. */
+export const weatherApi = {
+  list: (signal?: AbortSignal) => api.get<WeatherListDTO>('/weather', signal),
 };

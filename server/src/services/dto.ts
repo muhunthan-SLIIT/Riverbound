@@ -51,6 +51,7 @@ export function toCampaignDTO(c: CampaignDoc): CampaignDTO {
           encounters: getRegion(c.expedition.regionId).encounters,
           timed: c.expedition.timed,
           medicUsed: c.expedition.medicUsed,
+          weather: c.expedition.weather ?? null,
         }
       : null,
     scoutUsedRegions: [...c.scoutUsedRegions],

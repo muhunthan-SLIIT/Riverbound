@@ -1,4 +1,4 @@
-// HTTP handlers for campaigns, camp actions, feeding, shop and sounds.
+// HTTP handlers for campaigns, camp actions, feeding, shop, sounds and river weather.
 import type { Request, Response } from 'express';
 import { SHOP_ITEMS } from '@riverbound/shared';
 import { currentUserId } from '../middleware/auth.ts';
@@ -9,6 +9,7 @@ import * as crossing from '../services/crossing.service.ts';
 import * as feeding from '../services/feeding.service.ts';
 import { getLeaderboard } from '../services/leaderboard.service.ts';
 import { listSounds } from '../services/sound.service.ts';
+import { listRegionWeather } from '../services/weather.service.ts';
 import { asObject, requireActionKey, requireObjectId } from '../utils/validate.ts';
 
 /** Collects the ids every camp action needs: which campaign, which player, which request key. */
@@ -122,5 +123,10 @@ export const gameController = {
   // ----- sounds (from the Freesound API, prepared by the worker) -----
   async sounds(_req: Request, res: Response) {
     res.json({ sounds: await listSounds() });
+  },
+
+  // ----- river weather (from the Open-Meteo API, prepared by the worker) -----
+  async weather(_req: Request, res: Response) {
+    res.json({ weather: await listRegionWeather() });
   },
 };

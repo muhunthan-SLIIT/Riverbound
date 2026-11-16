@@ -9,6 +9,7 @@ export * from './rules/regions.ts';
 export * from './rules/crossing.ts';
 export * from './rules/sounds.ts';
 export * from './rules/account.ts';
+export * from './rules/weather.ts';
 export * from './rules/objectives.ts';
 export type {
   ApiErrorBody,
@@ -28,4 +29,5 @@ export type {
   ShopItemDTO,
   SoundDTO,
   UserDTO,
+  WeatherListDTO,
 } from './types/api.ts';

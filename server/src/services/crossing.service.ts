@@ -28,6 +28,12 @@ import { Challenge, Content, type CampaignDoc, type ChallengeDoc, type ContentDo
 import { AppError, badRequest, conflict, notFound } from '../utils/errors.ts';
 import { looksLikeImage } from '../utils/image.ts';
 import { claimPuzzle } from './content.service.ts';
+import { getRegionWeather } from './weather.service.ts';
+
+/** Timer for one timed crossing: the region's time minus the weather penalty (rain or storm: -5 s). */
+export function crossingSeconds(regionSeconds: number, weather: { timerPenaltySeconds: number } | null | undefined): number {
+  return Math.max(10, regionSeconds - (weather?.timerPenaltySeconds ?? 0));
+}
 import { runAction } from './action.service.ts';
 import { assertAtCampAndFree, loadOwnedCampaign } from './campaign.service.ts';
 import { toCampaignDTO, toCrossingChallengeDTO } from './dto.ts';
@@ -72,7 +78,7 @@ async function issueCrossing(c: CampaignDoc, session: ClientSession, now: Date, 
         region: exp.regionId,
         encounterIndex: exp.encounterIndex,
         timed: exp.timed,
-        deadline: exp.timed ? new Date(now.getTime() + regionRules.timerSeconds * 1000) : null,
+        deadline: exp.timed ? new Date(now.getTime() + crossingSeconds(regionRules.timerSeconds, exp.weather) * 1000) : null,
       },
     ],
     { session },
@@ -121,7 +127,9 @@ export async function startRoute(
     // Every expedition starts fully rested (rules: "Start a new expedition fully rested").
     c.hearts = MAX_HEARTS;
     c.state = 'crossing';
-    c.expedition = { regionId, encounterIndex: 0, timed, medicUsed: false, log: [] };
+    // The weather is fixed now, so it cannot change in the middle of the trip (it also sets the timer).
+    const weather = await getRegionWeather(regionId, clock(), session);
+    c.expedition = { regionId, encounterIndex: 0, timed, medicUsed: false, log: [], weather };
     const { challenge, content } = await issueCrossing(c, session, clock());
     await c.save({ session });
     return { challenge: toCrossingChallengeDTO(challenge, content), campaign: toCampaignDTO(c) };

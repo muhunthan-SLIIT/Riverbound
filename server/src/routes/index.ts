@@ -34,6 +34,7 @@ export function buildRoutes(env: Env): Router {
   // Public data
   router.get('/shop', g.shopCatalogue);
   router.get('/sounds', g.sounds);
+  router.get('/weather', g.weather);
 
   // Everything below needs a signed-in player
   router.use(requireAuth, gameLimit);

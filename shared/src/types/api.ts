@@ -4,6 +4,7 @@ import type { CharacterId } from '../rules/constants.ts';
 import type { AnswerKind, FeedingType, FeedingParams } from '../rules/feeding.ts';
 import type { ItemId, ItemState } from '../rules/shop.ts';
 import type { CompanionId, RegionId } from '../rules/regions.ts';
+import type { RegionWeather } from '../rules/weather.ts';
 
 export type CampaignState = 'at_camp' | 'feeding' | 'crossing' | 'failed' | 'completed' | 'abandoned';
 
@@ -50,6 +51,8 @@ export type ExpeditionDTO = {
   encounters: number; // total crossings in this region
   timed: boolean;
   medicUsed: boolean;
+  /** Weather fixed when the trip started (live from the real river place, or labelled backup). */
+  weather: RegionWeather | null;
 };
 
 export type CrossingLogDTO = {
@@ -159,3 +162,6 @@ export type LeaderboardDTO = {
   you: LeaderboardEntryDTO | null; // your best finished journey, or null if you have not finished yet
   totalPlayers: number; // players who have finished
 };
+
+/** GET /api/weather: the weather each region would use if a trip started now. */
+export type WeatherListDTO = { weather: RegionWeather[] };

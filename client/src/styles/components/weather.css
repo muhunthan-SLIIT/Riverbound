@@ -1,0 +1,151 @@
+/* River weather: line (map markers), card (map panel, Route Details), badge (crossing) and effects.
+   Colours come from the Living River tokens. Effects sit BEHIND the panels, never over the fish picture. */
+
+.weather-line {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-water);
+  font-size: 14px;
+}
+.weather-line--storm {
+  color: var(--color-coral);
+}
+
+.weather-summary {
+  margin: var(--space-3) 0 0;
+  color: var(--color-paper);
+  font-size: 15px;
+  line-height: 1.45;
+}
+.weather-summary__source {
+  color: var(--color-mist);
+  font-size: 14px;
+}
+
+.weather-card {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--color-hud-border);
+  border-radius: var(--radius-panel);
+  background: rgb(7 59 58 / 55%);
+}
+.weather-card--storm {
+  border-color: var(--color-coral);
+}
+.weather-card__eyebrow {
+  margin: 0;
+  color: var(--color-gold);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.weather-card__main {
+  margin: var(--space-1) 0 0;
+  color: var(--color-paper);
+  font-family: var(--font-display);
+  font-size: 24px;
+}
+.weather-card__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  margin: var(--space-3) 0 0;
+}
+.weather-card__facts div {
+  display: flex;
+  flex-direction: column;
+}
+.weather-card__facts dt {
+  color: var(--color-mist);
+  font-size: 13px;
+}
+.weather-card__facts dd {
+  margin: 0;
+  color: var(--color-paper);
+  font-size: 17px;
+  font-weight: 600;
+}
+.weather-card__source,
+.weather-card__live,
+.weather-card__effect {
+  margin: var(--space-2) 0 0;
+  color: var(--color-mist);
+  font-size: 14px;
+}
+.weather-card__effect {
+  color: var(--color-gold);
+}
+
+.weather-badge {
+  display: inline-block;
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-hud-border);
+  border-radius: 999px;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-size: 14px;
+}
+.weather-badge--storm {
+  border-color: var(--color-coral);
+}
+
+/* ----- effects: above the painted art and its dark layer (z-index -2 / -1 inside the isolated
+   .scene), below every panel, so they never cover the fish picture or any text ----- */
+.weather-fx {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.weather-fx--rain,
+.weather-fx--storm {
+  background-image: repeating-linear-gradient(
+    105deg,
+    rgb(214 235 225 / 0%) 0 14px,
+    rgb(214 235 225 / 22%) 14px 15px,
+    rgb(214 235 225 / 0%) 15px 34px
+  );
+  background-size: 120px 160px;
+  animation: weather-rain 0.7s linear infinite;
+}
+.weather-fx--storm {
+  background-color: rgb(16 37 49 / 25%);
+  background-size: 90px 120px;
+  animation:
+    weather-rain 0.45s linear infinite,
+    weather-lightning 9s ease-in-out infinite;
+}
+@keyframes weather-rain {
+  to {
+    background-position: -40px 160px;
+  }
+}
+/* A soft, slow glow (once every 9 seconds), never fast flashing. */
+@keyframes weather-lightning {
+  0%,
+  88%,
+  100% {
+    box-shadow: inset 0 0 0 100vmax rgb(244 232 204 / 0%);
+  }
+  92% {
+    box-shadow: inset 0 0 0 100vmax rgb(244 232 204 / 10%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weather-fx--rain,
+  .weather-fx--storm {
+    animation: none;
+  }
+}
+:root[data-reduced-motion] .weather-fx--rain,
+:root[data-reduced-motion] .weather-fx--storm {
+  animation: none;
+}
+
+.weather-credit {
+  color: var(--color-water);
+  text-decoration: underline;
+}

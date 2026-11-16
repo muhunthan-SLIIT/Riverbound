@@ -113,6 +113,11 @@ export function HelpPage() {
                 Sound effects: <a href="https://freesound.org">Freesound</a>, CC0 (public domain) sounds only. Simple browser tones are used when Freesound is
                 unavailable.
               </li>
+              <li>
+                River weather: <a href="https://open-meteo.com/">Weather data by Open-Meteo.com</a> (CC BY 4.0), live from four real rivers: the
+                Nile at Aswan (easy), the Atrato at Quibdó (medium), the Zambezi at Victoria Falls (hard) and the Catatumbo at Lake Maracaibo
+                (final). When the live weather does not fit a level, the game shows a backup and says so.
+              </li>
               <li>Fonts: Fraunces and Inter, from Google Fonts (SIL Open Font License).</li>
               <li>Artwork: provisional illustrations from the Riverbound Figma design.</li>
               <li>Riverbound by Ulaganesan Muhunthan (UOB 2541667), Distributed Service Architecture.</li>

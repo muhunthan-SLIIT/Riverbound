@@ -1,7 +1,7 @@
 // One saved game (campaign). The inventory is stored inside the campaign document,
 // so wallet + fish + items always change together in one atomic write.
 import { Schema, model, type HydratedDocument, type Types } from 'mongoose';
-import type { CampaignState, CharacterId, CompanionId, ItemId, RegionId } from '@riverbound/shared';
+import type { CampaignState, CharacterId, CompanionId, ItemId, RegionId, RegionWeather } from '@riverbound/shared';
 
 export interface ICampaign {
   owner: Types.ObjectId;
@@ -51,6 +51,8 @@ export interface ICampaign {
     medicUsed: boolean;
     // Crossings cleared on this trip (for the Region Complete page).
     log: CrossingLog[];
+    // Weather fixed when the trip started (live or labelled backup). null for trips started before weather existed.
+    weather: RegionWeather | null;
   } | null;
   regionResults: {
     regionId: RegionId;
@@ -135,6 +137,8 @@ const campaignSchema = new Schema<ICampaign>(
           timed: { type: Boolean, required: true },
           medicUsed: { type: Boolean, default: false },
           log: { type: [crossingLogSchema], default: [] },
+          // Stored as a plain snapshot; it is only ever written once, by the server, at route start.
+          weather: { type: Schema.Types.Mixed, default: null },
         },
         { _id: false },
       ),

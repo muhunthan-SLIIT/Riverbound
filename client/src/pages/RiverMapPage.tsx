@@ -4,6 +4,7 @@
 // Without a compass the map is readable, but travel is blocked ("Buy a compass to follow the route").
 // Selecting a marker only shows information. It never starts a crossing or spends anything.
 // "Accessible route list" shows the same routes as plain text (spec: text equivalent for the map).
+// Each route also shows its river weather (Open-Meteo live weather from a real river place, or a labelled backup).
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -15,9 +16,12 @@ import {
   type CampaignDTO,
   type Region,
   type RegionId,
+  type RegionWeather,
   type RouteStatus,
 } from '@riverbound/shared';
 import { GameLayout } from '../components/game/GameLayout.tsx';
+import { WeatherLine, WeatherSummary } from '../components/game/RiverWeather.tsx';
+import { useRegionWeather } from '../hooks/useRegionWeather.ts';
 import { SpriteIcon } from '../components/SpriteIcon.tsx';
 import { paths } from '../routes/paths.ts';
 import '../styles/pages/map.css';
@@ -49,6 +53,7 @@ function MapContent({ campaign: c }: { campaign: CampaignDTO }) {
   const firstOpen = REGIONS.find((r) => routeStatus(r.id, c.regionsCleared) === 'available') ?? REGIONS[REGIONS.length - 1]!;
   const [selected, setSelected] = useState<RegionId>(firstOpen.id);
   const [listView, setListView] = useState(false);
+  const weather = useRegionWeather();
 
   if (!owned.includes('river_map')) {
     return (
@@ -77,7 +82,7 @@ function MapContent({ campaign: c }: { campaign: CampaignDTO }) {
       </div>
 
       {listView ? (
-        <RouteList campaign={c} onClose={() => setListView(false)} />
+        <RouteList campaign={c} onClose={() => setListView(false)} weather={weather} />
       ) : (
         <nav className="rivermap__markers" aria-label="River routes">
           {REGIONS.map((r) => {
@@ -97,18 +102,31 @@ function MapContent({ campaign: c }: { campaign: CampaignDTO }) {
                   {r.name}
                 </span>
                 <span className="marker__sub">{markerSubtitle(r, status)}</span>
+                {status !== 'cleared' && <WeatherLine weather={weather?.[r.id]} />}
               </button>
             );
           })}
         </nav>
       )}
 
-      <RouteDetails campaign={c} region={region} onShowList={() => setListView(true)} listView={listView} />
+      <RouteDetails campaign={c} region={region} onShowList={() => setListView(true)} listView={listView} weather={weather?.[region.id]} />
     </main>
   );
 }
 
-function RouteDetails({ campaign: c, region, onShowList, listView }: { campaign: CampaignDTO; region: Region; onShowList: () => void; listView: boolean }) {
+function RouteDetails({
+  campaign: c,
+  region,
+  onShowList,
+  listView,
+  weather,
+}: {
+  campaign: CampaignDTO;
+  region: Region;
+  onShowList: () => void;
+  listView: boolean;
+  weather: RegionWeather | undefined;
+}) {
   const owned = c.inventory.ownedItems;
   const status = routeStatus(region.id, c.regionsCleared);
   const missing = missingGear(region.id, owned);
@@ -136,6 +154,7 @@ function RouteDetails({ campaign: c, region, onShowList, listView }: { campaign:
           </span>
         ))}
       </p>
+      {status !== 'cleared' && <WeatherSummary weather={weather} />}
       {status === 'available' ? (
         <Link to={paths.route(c.id, region.id)} className="btn btn-primary route-panel__go">
           Prepare Route
@@ -155,7 +174,15 @@ function RouteDetails({ campaign: c, region, onShowList, listView }: { campaign:
 }
 
 /** The same information as the map, as a plain list (keyboard and screen-reader friendly). */
-function RouteList({ campaign: c, onClose }: { campaign: CampaignDTO; onClose: () => void }) {
+function RouteList({
+  campaign: c,
+  onClose,
+  weather,
+}: {
+  campaign: CampaignDTO;
+  onClose: () => void;
+  weather: Partial<Record<RegionId, RegionWeather>> | null;
+}) {
   const owned = c.inventory.ownedItems;
   return (
     <section className="panel route-list" aria-labelledby="route-list-title">
@@ -170,7 +197,8 @@ function RouteList({ campaign: c, onClose }: { campaign: CampaignDTO; onClose: (
             <li key={r.id}>
               <strong>{r.name}</strong> — {cap(r.difficulty)}, {r.encounters} crossings, {STATUS_LABEL[status].toLowerCase()}.
               {r.rescues && ` Rescue ${COMPANIONS[r.rescues].name} (${COMPANIONS[r.rescues].role}).`}
-              {status !== 'cleared' && missing.length > 0 && ` Missing: ${missing.map((m) => getShopItem(m).name.toLowerCase()).join(', ')}.`}{' '}
+              {status !== 'cleared' && missing.length > 0 && ` Missing: ${missing.map((m) => getShopItem(m).name.toLowerCase()).join(', ')}.`}
+              {status !== 'cleared' && weather?.[r.id] && ` Weather: ${weather[r.id]?.condition}, wind ${Math.round(weather[r.id]?.windKmh ?? 0)} km/h${weather[r.id]?.source === 'backup' ? ' (backup)' : ` (live, ${weather[r.id]?.place})`}.`}{' '}
               {status === 'available' && <Link to={paths.route(c.id, r.id)}>Prepare route</Link>}
             </li>
           );

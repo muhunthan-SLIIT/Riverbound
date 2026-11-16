@@ -24,6 +24,13 @@ import {
   resolveCrossing,
   workedSolution,
   type ItemId,
+  BACKUP_WEATHER,
+  REGION_IDS,
+  WEATHER_MAX_AGE_MS,
+  WEATHER_PLACES,
+  classifyWeather,
+  isValidReading,
+  resolveRegionWeather,
 } from '../src/index.ts';
 
 test('shop: map must be bought first, then compass', () => {
@@ -244,4 +251,56 @@ test('leaderboard: perfect rate is a whole percentage, or null with no answers',
   assert.equal(perfectRate(0, 0), null);
   assert.equal(perfectRate(13, 15), 87);
   assert.equal(perfectRate(15, 15), 100);
+});
+
+// ---------------------------------------------------------------- weather (16 Nov 2026)
+
+test('weather: readings are sorted into calm, rain and storm', () => {
+  assert.equal(classifyWeather({ weatherCode: 0, rainMm: 0, windKmh: 8, gustKmh: 14 }), 'calm');
+  assert.equal(classifyWeather({ weatherCode: 2, rainMm: 0, windKmh: 22, gustKmh: 30 }), 'rain'); // breezy
+  assert.equal(classifyWeather({ weatherCode: 61, rainMm: 0.4, windKmh: 10, gustKmh: 18 }), 'rain');
+  assert.equal(classifyWeather({ weatherCode: 95, rainMm: 2, windKmh: 15, gustKmh: 25 }), 'storm'); // thunder
+  assert.equal(classifyWeather({ weatherCode: 3, rainMm: 0, windKmh: 30, gustKmh: 55 }), 'storm'); // strong gusts
+  assert.equal(classifyWeather({ weatherCode: 65, rainMm: 9, windKmh: 12, gustKmh: 20 }), 'storm'); // heavy rain
+  for (const kind of ['calm', 'rain', 'storm'] as const) assert.equal(classifyWeather(BACKUP_WEATHER[kind]), kind);
+});
+
+test('weather: every region has one real place', () => {
+  for (const id of REGION_IDS) assert.equal(WEATHER_PLACES.filter((p) => p.regionId === id).length, 1);
+});
+
+test('weather: live weather is used only when it is fresh and fits the level; otherwise a labelled backup', () => {
+  const now = new Date('2026-11-16T12:00:00Z');
+  const calm = { weatherCode: 0, rainMm: 0, windKmh: 6, gustKmh: 10, observedAt: new Date('2026-11-16T11:45:00Z') };
+
+  const easy = resolveRegionWeather('shallow_bend', calm, now);
+  assert.equal(easy.source, 'live');
+  assert.equal(easy.kind, 'calm');
+  assert.equal(easy.place, 'Aswan');
+  assert.equal(easy.liveNow, null);
+  assert.equal(easy.timerPenaltySeconds, 0);
+
+  // Calm at the storm place: the game uses a backup storm and says what the real place shows.
+  const hard = resolveRegionWeather('rapid_gorge', calm, now);
+  assert.equal(hard.source, 'backup');
+  assert.equal(hard.kind, 'storm');
+  assert.equal(hard.condition, 'Thunderstorm');
+  assert.match(hard.liveNow ?? '', /Clear sky, wind 6 km\/h/);
+  assert.equal(hard.timerPenaltySeconds, 5);
+
+  // Too old or missing: backup, with no "live now" text.
+  const old = { ...calm, observedAt: new Date(now.getTime() - WEATHER_MAX_AGE_MS - 1) };
+  assert.equal(resolveRegionWeather('shallow_bend', old, now).source, 'backup');
+  const none = resolveRegionWeather('reed_marsh', null, now);
+  assert.equal(none.source, 'backup');
+  assert.equal(none.kind, 'rain');
+  assert.equal(none.observedAt, null);
+});
+
+test('weather: bad API values are rejected', () => {
+  assert.equal(isValidReading({ weatherCode: 61, rainMm: 1.2, windKmh: 10, gustKmh: 20 }), true);
+  assert.equal(isValidReading({ weatherCode: 61.5, rainMm: 1, windKmh: 10, gustKmh: 20 }), false);
+  assert.equal(isValidReading({ weatherCode: 61, rainMm: -1, windKmh: 10, gustKmh: 20 }), false);
+  assert.equal(isValidReading({ weatherCode: 61, rainMm: 1, windKmh: Number.NaN, gustKmh: 20 }), false);
+  assert.equal(isValidReading({ weatherCode: 61, rainMm: 1, windKmh: 10 }), false);
 });
